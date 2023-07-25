@@ -9,6 +9,5 @@ import io.multimoon.colorful.CActivity
 class SplashActivity : CActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.i("com.kosmo.uncrowded","SplashActivity : 시작")
     }
 }
