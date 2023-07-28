@@ -4,8 +4,16 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.FirebaseApp
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.iid.FirebaseInstanceIdReceiver
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.GsonBuilder
 import com.iamport.sdk.data.sdk.IamPortRequest
 import com.iamport.sdk.data.sdk.IamPortResponse
@@ -20,7 +28,7 @@ import io.multimoon.colorful.CAppCompatActivity
 class MainActivity : CAppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-
+    private lateinit var analytics: FirebaseAnalytics
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.i("com.kosmo.uncrowded","MainActivity생성")
         super.onCreate(savedInstanceState)
@@ -33,15 +41,8 @@ class MainActivity : CAppCompatActivity() {
         tablayout.addTab(tablayout.newTab().setIcon(R.drawable.contact).setText("연락처"))
         tablayout.addTab(tablayout.newTab().setIcon(R.drawable.settings).setText("설정"))
 
-//        Colorful().edit()
-//            .setPrimaryColor(ThemeColor.RED)
-//            .setAccentColor(ThemeColor.BLUE)
-//            .setDarkTheme(true)
-//            .setTranslucent(true)
-//            .setCustomThemeOverride(R.style.Theme_Uncrowded)
-//            .apply(this)
-
-
+        //firebase
+        analytics = Firebase.analytics
         askNotificationPermission()
 
         Iamport.init(this)
@@ -59,25 +60,31 @@ class MainActivity : CAppCompatActivity() {
             Iamport.payment("imp64087601", iamPortRequest = request
             ) {
                 callBackListener.result(it)
+                Iamport.close()
             }
         }
 
-//        FirebaseApp.initializeApp(this)
+        FirebaseApp.initializeApp(this)
 
-//        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
-//            if (!task.isSuccessful) {
-//                Log.i("com.kosmo.uncrowded","Fetching FCM registration token failed")
-//                return@OnCompleteListener
-//            }
-//
-//            // Get new FCM registration token
-//            val token = task.result
-//
-//            // Log and toast
-////            val msg = getString(R.string.msg_token_fmt, token)
-//            Log.i("com.kosmo.uncrowded",token)
-//            Toast.makeText(baseContext, token, Toast.LENGTH_SHORT).show()
-//        })
+
+
+
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.i("com.kosmo.uncrowded","Fetching FCM registration token failed")
+                return@OnCompleteListener
+            }
+
+            // Get new FCM registration token
+            val token = task.result
+
+            // Log and toast
+//            val msg = getString(R.string.msg_token_fmt, token)
+            Log.i("com.kosmo.uncrowded",token)
+            Toast.makeText(this, token, Toast.LENGTH_SHORT).show()
+        })
+
+
 
     }
 

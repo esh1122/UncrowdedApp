@@ -8,7 +8,7 @@ import com.iamport.sdk.domain.core.Iamport
 import com.kosmo.uncrowded.model.EventDTO
 import com.kosmo.uncrowded.model.MemberDTO
 
-class UncrowdedEventPaymentRequestDTO(eventDto: EventDTO,memberDto : MemberDTO) {
+class UncrowdedEventPaymentRequestBuilder(eventDto: EventDTO,memberDto : MemberDTO) {
 
     private val eventDto = eventDto
     private val memberDto = memberDto
@@ -16,7 +16,7 @@ class UncrowdedEventPaymentRequestDTO(eventDto: EventDTO,memberDto : MemberDTO) 
     private lateinit var iamPortRequest : IamPortRequest
 
 
-    fun kakao() {
+    fun kakao() : UncrowdedEventPaymentRequestBuilder {
         iamPortRequest = IamPortRequest(
             pg = PG.kakaopay.makePgRawName(pgId = ""),           // PG 사
             pay_method = PayMethod.kakaopay.name,                // 결제수단
@@ -26,6 +26,7 @@ class UncrowdedEventPaymentRequestDTO(eventDto: EventDTO,memberDto : MemberDTO) 
             buyer_name = memberDto.name,
             card = null, // 카드사 다이렉트
         )
+        return this
     }
 
     fun payment(iamPortRequest: IamPortRequest,paymentResultCallback: (IamPortResponse?) -> Unit) {

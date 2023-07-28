@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "220962429230",
+    "project_id": "uplifted-oxide-392501",
+    "storage_bucket": "uplifted-oxide-392501.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:220962429230:android:a7d6e54baf19c9d00c02bf",
+        "android_client_info": {
+          "package_name": "com.kosmo.uncrowded"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "220962429230-gcd50dsgvsb7nf9ceo8v3n4eh53i89ho.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDmtuVLuTxU8FTIggxBSxTNbM7RwXLARrQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "220962429230-gcd50dsgvsb7nf9ceo8v3n4eh53i89ho.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
