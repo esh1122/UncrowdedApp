@@ -4,16 +4,18 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.ViewGroup
 import android.widget.Toast
+import android.widget.ToggleButton
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
-import com.google.firebase.iid.FirebaseInstanceIdReceiver
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.messaging.ktx.messaging
 import com.google.gson.GsonBuilder
 import com.iamport.sdk.data.sdk.IamPortRequest
 import com.iamport.sdk.data.sdk.IamPortResponse
@@ -21,8 +23,10 @@ import com.iamport.sdk.data.sdk.PG
 import com.iamport.sdk.data.sdk.PayMethod
 import com.iamport.sdk.domain.core.ICallbackPaymentResult
 import com.iamport.sdk.domain.core.Iamport
+import com.kakao.sdk.common.util.Utility
 import com.kosmo.uncrowded.databinding.ActivityMainBinding
 import io.multimoon.colorful.CAppCompatActivity
+import net.daum.mf.map.api.MapView
 
 
 class MainActivity : CAppCompatActivity() {
@@ -66,9 +70,6 @@ class MainActivity : CAppCompatActivity() {
 
         FirebaseApp.initializeApp(this)
 
-
-
-
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
             if (!task.isSuccessful) {
                 Log.i("com.kosmo.uncrowded","Fetching FCM registration token failed")
@@ -84,7 +85,36 @@ class MainActivity : CAppCompatActivity() {
             Toast.makeText(this, token, Toast.LENGTH_SHORT).show()
         })
 
+        binding.favoriteBtn.setOnClickListener {
+            if ((it as ToggleButton).isChecked){
+                Firebase.messaging.subscribeToTopic("location052")
+                    .addOnCompleteListener { task ->
+                        var msg = "Subscribed"
+                        if (!task.isSuccessful) {
+                            msg = "Subscribe failed"
+                        }
+                        Log.d("com.kosmo.uncrowded", msg)
+                        Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
+                    }
+            }else{
+                Firebase.messaging.unsubscribeFromTopic("location052").addOnCompleteListener { task ->
+                    var msg = "Unsubscribed"
+                    if (!task.isSuccessful) {
+                        msg = "Unsubscribed failed"
+                    }
+                    Log.d("com.kosmo.uncrowded", msg)
+                    Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+//        Log.d("com.kosmo.uncrowded", "keyhash : ${Utility.getKeyHash(this)}")
 
+        val mapView = MapView(this)
+        val mapViewContainer = binding.mapView as ViewGroup
+        mapViewContainer.addView(mapView)
+        mapView.setMapViewEventListener {
+
+        }
 
     }
 

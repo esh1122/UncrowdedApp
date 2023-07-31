@@ -16,6 +16,7 @@
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="vertical"
             >
             <Button
                 android:layout_width="wrap_content"
@@ -23,8 +24,28 @@
                 android:gravity="center"
                 android:text="카카오 결제 테스트"
                 android:id="@+id/test_kakao"
+                android:layout_gravity="center"
                 />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#76BA7D"
+                android:hint="입력하세요"
+                android:gravity="center"
+                android:textSize="20sp"/>
+            <ToggleButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:id="@+id/favoriteBtn"
+                android:background="#21B2CF"
+                android:layout_margin="10dp"/>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="400dp"
+                android:id="@+id/map_view">
 
+            </RelativeLayout>
         </androidx.appcompat.widget.LinearLayoutCompat>
     </ScrollView>
     <LinearLayout

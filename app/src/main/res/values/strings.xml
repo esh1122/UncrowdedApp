@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Uncrowded</string>
+    <string name="kakao_app_key">kakaoa7ac18b64856379eb768d825d3f78ce3</string>
+    <string name="kakao_map_app_key">a7ac18b64856379eb768d825d3f78ce3</string>
 </resources>
