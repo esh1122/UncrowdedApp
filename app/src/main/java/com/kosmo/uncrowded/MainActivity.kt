@@ -9,6 +9,7 @@ import android.widget.Toast
 import android.widget.ToggleButton
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.navigation.fragment.NavHostFragment
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.FirebaseAnalytics
@@ -39,82 +40,32 @@ class MainActivity : CAppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val tablayout = binding.tabLayout
-
-        tablayout.addTab(tablayout.newTab().setIcon(R.drawable.home).setText("HOME"))
-        tablayout.addTab(tablayout.newTab().setIcon(R.drawable.contact).setText("연락처"))
-        tablayout.addTab(tablayout.newTab().setIcon(R.drawable.settings).setText("설정"))
-
         //firebase
         analytics = Firebase.analytics
         askNotificationPermission()
-
-        Iamport.init(this)
-
-        binding.testKakao.setOnClickListener {
-            val request = IamPortRequest(
-                pg = PG.kakaopay.makePgRawName(pgId = ""),           // PG 사
-                pay_method = PayMethod.kakaopay.name,                // 결제수단
-                name = "결제 테스트",                         // 주문명
-                merchant_uid = "muid_aos_1690263354456",                 // 주문번호
-                amount = "1000",                            // 결제금액
-                buyer_name = "남궁안녕",
-                card = null, // 카드사 다이렉트
-            )
-            Iamport.payment("imp64087601", iamPortRequest = request
-            ) {
-                callBackListener.result(it)
-                Iamport.close()
-            }
-        }
-
+        
+//        //아임포트 결제 초기화
+//        Iamport.init(this)
+        //파이어베이스 초기화
         FirebaseApp.initializeApp(this)
-
+        //
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
             if (!task.isSuccessful) {
                 Log.i("com.kosmo.uncrowded","Fetching FCM registration token failed")
                 return@OnCompleteListener
             }
-
-            // Get new FCM registration token
+            //토큰 받아오기
             val token = task.result
-
             // Log and toast
-//            val msg = getString(R.string.msg_token_fmt, token)
             Log.i("com.kosmo.uncrowded",token)
-            Toast.makeText(this, token, Toast.LENGTH_SHORT).show()
         })
 
-        binding.favoriteBtn.setOnClickListener {
-            if ((it as ToggleButton).isChecked){
-                Firebase.messaging.subscribeToTopic("location052")
-                    .addOnCompleteListener { task ->
-                        var msg = "Subscribed"
-                        if (!task.isSuccessful) {
-                            msg = "Subscribe failed"
-                        }
-                        Log.d("com.kosmo.uncrowded", msg)
-                        Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
-                    }
-            }else{
-                Firebase.messaging.unsubscribeFromTopic("location052").addOnCompleteListener { task ->
-                    var msg = "Unsubscribed"
-                    if (!task.isSuccessful) {
-                        msg = "Unsubscribed failed"
-                    }
-                    Log.d("com.kosmo.uncrowded", msg)
-                    Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
-//        Log.d("com.kosmo.uncrowded", "keyhash : ${Utility.getKeyHash(this)}")
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
 
-        val mapView = MapView(this)
-        val mapViewContainer = binding.mapView as ViewGroup
-        mapViewContainer.addView(mapView)
-        mapView.setMapViewEventListener {
 
-        }
+
 
     }
 
@@ -124,7 +75,7 @@ class MainActivity : CAppCompatActivity() {
         if (isGranted) {
             // FCM SDK (and your app) can post notifications.
         } else {
-            // TODO: Inform user that that your app will not show notifications.
+
         }
     }
 
@@ -136,10 +87,7 @@ class MainActivity : CAppCompatActivity() {
             ) {
                 // FCM SDK (and your app) can post notifications.
             } else if (shouldShowRequestPermissionRationale(android.Manifest.permission.POST_NOTIFICATIONS)) {
-                // TODO: display an educational UI explaining to the user the features that will be enabled
-                //       by them granting the POST_NOTIFICATION permission. This UI should provide the user
-                //       "OK" and "No thanks" buttons. If the user selects "OK," directly request the permission.
-                //       If the user selects "No thanks," allow the user to continue without notifications.
+
             } else {
                 // Directly ask for the permission
                 requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
@@ -147,10 +95,30 @@ class MainActivity : CAppCompatActivity() {
         }
     }
 
-    private val callBackListener = object : ICallbackPaymentResult {
-        override fun result(iamPortResponse: IamPortResponse?) {
-            val resJson = GsonBuilder().setPrettyPrinting().create().toJson(iamPortResponse)
-            Log.i("SAMPLE", "결제 결과 콜백\n$resJson")
-        }
-    }
+
+
 }
+//fire 베이스 구독과 구독 해지 메소드
+//            binding.favoriteBtn.setOnClickListener {
+//            if ((it as ToggleButton).isChecked){
+//                Firebase.messaging.subscribeToTopic("location052")
+//                    .addOnCompleteListener { task ->
+//                        var msg = "Subscribed"
+//                        if (!task.isSuccessful) {
+//                            msg = "Subscribe failed"
+//                        }
+//                        Log.d("com.kosmo.uncrowded", msg)
+//                        Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
+//                    }
+//            }else{
+//                Firebase.messaging.unsubscribeFromTopic("location052").addOnCompleteListener { task ->
+//                    var msg = "Unsubscribed"
+//                    if (!task.isSuccessful) {
+//                        msg = "Unsubscribed failed"
+//                    }
+//                    Log.d("com.kosmo.uncrowded", msg)
+//                    Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
+//                }
+//            }
+//        }
+//        Log.d("com.kosmo.uncrowded", "keyhash : ${Utility.getKeyHash(this)}")
