@@ -9,8 +9,11 @@ import android.widget.Toast
 import android.widget.ToggleButton
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.NavigationUI
 import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.material.navigation.NavigationBarView
 import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
@@ -34,6 +37,7 @@ class MainActivity : CAppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var analytics: FirebaseAnalytics
+    private lateinit var navController: NavController
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.i("com.kosmo.uncrowded","MainActivity생성")
         super.onCreate(savedInstanceState)
@@ -62,9 +66,21 @@ class MainActivity : CAppCompatActivity() {
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        val navController = navHostFragment.navController
+        navController = navHostFragment.navController
 
-
+        binding.bottomBar.onTabSelected = {
+            when(it.title){
+                "Main"->{
+                    navController.navigate(R.id.action_to_mainFragment)
+                }
+                "Event"->{
+                    navController.navigate(R.id.action_to_eventFragment)
+                }
+                "Location"->{
+                    navController.navigate(R.id.action_to_locationFragment)
+                }
+            }
+        }
 
 
     }

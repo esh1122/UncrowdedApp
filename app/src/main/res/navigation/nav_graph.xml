@@ -10,4 +10,26 @@
         android:name="com.kosmo.uncrowded.view.MainFragment"
         android:label="fragment_main"
         tools:layout="@layout/fragment_main" />
+
+    <fragment
+        android:id="@+id/eventFragment"
+        android:name="com.kosmo.uncrowded.view.EventFragment"
+        android:label="fragment_event"
+        tools:layout="@layout/fragment_event" />
+    <fragment
+        android:id="@+id/locationFragment"
+        android:name="com.kosmo.uncrowded.view.LocationFragment"
+        android:label="fragment_location"
+        tools:layout="@layout/fragment_location" />
+
+    <action
+        android:id="@+id/action_to_mainFragment"
+        app:destination="@id/mainFragment"/>
+    <action
+        android:id="@+id/action_to_eventFragment"
+        app:destination="@id/eventFragment"/>
+    <action
+        android:id="@+id/action_to_locationFragment"
+        app:destination="@id/locationFragment"/>
+
 </navigation>

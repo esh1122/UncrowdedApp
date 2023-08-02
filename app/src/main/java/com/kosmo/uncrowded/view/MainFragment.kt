@@ -30,7 +30,6 @@ class MainFragment : Fragment() {
         mapView.setMapViewEventListener {
 
         }
-
         return binding!!.root
     }
 
@@ -38,6 +37,4 @@ class MainFragment : Fragment() {
         super.onDestroyView()
         binding = null
     }
-
-
 }
