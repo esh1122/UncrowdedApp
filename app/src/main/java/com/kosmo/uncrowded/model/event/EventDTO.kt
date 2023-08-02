@@ -1,4 +1,4 @@
-package com.kosmo.uncrowded.model
+package com.kosmo.uncrowded.model.event
 
 data class EventDTO(
     var event_Code : String,

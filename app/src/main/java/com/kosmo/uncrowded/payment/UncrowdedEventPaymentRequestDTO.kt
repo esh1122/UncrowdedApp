@@ -5,10 +5,10 @@ import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.PG
 import com.iamport.sdk.data.sdk.PayMethod
 import com.iamport.sdk.domain.core.Iamport
-import com.kosmo.uncrowded.model.EventDTO
+import com.kosmo.uncrowded.model.event.EventDTO
 import com.kosmo.uncrowded.model.MemberDTO
 
-class UncrowdedEventPaymentRequestBuilder(eventDto: EventDTO,memberDto : MemberDTO) {
+class UncrowdedEventPaymentRequestBuilder(eventDto: EventDTO, memberDto : MemberDTO) {
 
     private val eventDto = eventDto
     private val memberDto = memberDto
