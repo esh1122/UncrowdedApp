@@ -95,10 +95,12 @@ dependencies {
 
     //bottom-navi-bar
     implementation 'nl.joery.animatedbottombar:library:1.1.0'
-    //actionBar
     
     //내비게이션
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
+
+    //dialog
+    implementation 'com.orhanobut:dialogplus:1.11@aar'
 
 }
