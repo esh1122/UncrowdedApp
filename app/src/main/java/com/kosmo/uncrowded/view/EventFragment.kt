@@ -2,6 +2,7 @@ package com.kosmo.uncrowded.view
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -19,7 +20,6 @@ import com.orhanobut.dialogplus.ListHolder
 
 class EventFragment : Fragment() {
 
-
     private lateinit var context : Context
     private var binding: FragmentEventBinding? = null
     private lateinit var dialog : DialogPlus
@@ -32,7 +32,8 @@ class EventFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentEventBinding.inflate(inflater,container,true)
+        Log.i("com.kosmo.uncrowded","EventFragment 생성")
+        binding = FragmentEventBinding.inflate(inflater,container,false)
         val adapter = EventSelectorAdapter(context, false, 2)
         dialog = DialogPlus.newDialog(context).apply {
             setContentHolder(GridHolder(1))

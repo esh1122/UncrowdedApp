@@ -106,15 +106,29 @@ class MainActivity : CAppCompatActivity() {
         })
     }
 
+    //버전에 따른 요청할 권한 삭제
+    private fun removeUnneededPermissions(){
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU){
+            permissions.remove(Manifest.permission.POST_NOTIFICATIONS)
+            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
+                permissions.remove(Manifest.permission.ACCESS_FINE_LOCATION)
+                permissions.remove(Manifest.permission.ACCESS_COARSE_LOCATION)
+            }
+        }
+    }
+
     //권한 요청
     private fun requestUserPermissions(){
         val deniedPermissions = mutableListOf<String>()
+        val shouldShowRequestPermissions = mutableListOf<String>()
         permissions.forEach {
             val checkPermission = ActivityCompat.checkSelfPermission(this, it) //0:권한 있다,-1:권한 없다
             if (checkPermission == PackageManager.PERMISSION_DENIED) {
                 deniedPermissions.add(it)//권한이 없는 경우 리스트에 저장
             }
+            Log.i("com.kosmo.uncrowded","$it : ${shouldShowRequestPermissionRationale(it)}")
         }
+        Log.i("com.kosmo.uncrowded","$deniedPermissions")
         if(deniedPermissions.isNotEmpty()){
             requestMultiplePermissionsLauncher.launch(deniedPermissions.toTypedArray())
         }
@@ -125,18 +139,23 @@ class MainActivity : CAppCompatActivity() {
         permissions.entries.forEach {
             when {
                 it.key == Manifest.permission.ACCESS_FINE_LOCATION && it.value -> {
-                    Log.d("PermissionRequest", "Location permission granted.")
+                    Log.d("com.kosmo.uncrowded", "${it.key} permission granted.")
                     sum +=1
                 }
-                it.key == Manifest.permission.CAMERA && it.value -> {
-                    Log.d("PermissionRequest", "Camera permission granted.")
+                it.key == Manifest.permission.ACCESS_COARSE_LOCATION && it.value -> {
+                    Log.d("com.kosmo.uncrowded", "${it.key} permission granted.")
+                    sum +=1
+                }
+                it.key == Manifest.permission.POST_NOTIFICATIONS && it.value -> {
+                    Log.d("com.kosmo.uncrowded", "${it.key} permission granted.")
                     sum +=1
                 }
                 else -> {
-                    Log.d("PermissionRequest", "${it.key} denied.")
+                    Log.d("com.kosmo.uncrowded", "${it.key} denied.")
                 }
             }
         }
+        Log.d("com.kosmo.uncrowded","permissions.size : ${permissions.size}")
         if(sum != permissions.size) finish()
     }
 
