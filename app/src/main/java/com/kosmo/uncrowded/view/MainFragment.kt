@@ -39,6 +39,7 @@ class MainFragment : Fragment(), MapView.MapViewEventListener {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        mapView.onPause()
         binding = null
     }
 

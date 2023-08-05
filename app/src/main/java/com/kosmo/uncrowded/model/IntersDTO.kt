@@ -1,3 +1,6 @@
 package com.kosmo.uncrowded.model
 
-data class IntersDTO(var inter_Code : String = "", var inter_Name : String = "")
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class IntersDTO(val inter_Code : String = "", val inter_Name : String = "")

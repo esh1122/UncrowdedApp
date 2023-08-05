@@ -22,8 +22,19 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import com.kakao.sdk.user.UserApiClient
 import com.kosmo.uncrowded.databinding.ActivityMainBinding
+import com.kosmo.uncrowded.login.service.KakaoService
+import com.kosmo.uncrowded.login.service.LoginService
+import com.kosmo.uncrowded.model.MemberDTO
 import io.multimoon.colorful.CAppCompatActivity
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
 
 
 class MainActivity : CAppCompatActivity() {
@@ -34,15 +45,41 @@ class MainActivity : CAppCompatActivity() {
     private var permissions = mutableListOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.POST_NOTIFICATIONS)
     private var canSendNoti = false
 
+    private lateinit var member : MemberDTO
+
+    private var isKakaoLogin = false
+
+    val fragmentMember : MemberDTO
+        get() = member
+
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.i("com.kosmo.uncrowded","MainActivity생성")
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        if(intent.getStringExtra("kakao") == resources.getString(R.string.uncrowded_key)){
+            isKakaoLogin = true
+            Log.i("com.kosmo.uncrowded","email 처리 : kakao")
+            UserApiClient.instance.me { user, error ->
+                if (user != null) {
+                    val email = user.kakaoAccount!!.email!!
+                    getUncrowdedUserByEmail(email)
+                }
+            }
+        }else{
+            Log.i("com.kosmo.uncrowded","email 처리 : preferences")
+            val preferences = getSharedPreferences("usersInfo", MODE_PRIVATE)
+            val email =preferences.getString("email",null)
+            if (email != null) {
+                getUncrowdedUserByEmail(email)
+            }
+        }
         //firebase
         analytics = Firebase.analytics
 
+        //버전에 따라 필요한 permission정리
+        removeUnneededPermissions()
         //권한 허용함수
         requestUserPermissions()
 
@@ -157,6 +194,35 @@ class MainActivity : CAppCompatActivity() {
         }
         Log.d("com.kosmo.uncrowded","permissions.size : ${permissions.size}")
         if(sum != permissions.size) finish()
+    }
+
+    private fun getUncrowdedUserByEmail(email : String,password : String? = null){
+        val retrofit = Retrofit.Builder()
+            .baseUrl(resources.getString(R.string.login_fast_api)) // Kakao API base URL
+            .addConverterFactory(Json{
+                ignoreUnknownKeys = true
+                coerceInputValues = true
+            }.asConverterFactory("application/json".toMediaType()))
+            .build() //스프링 REST API로 회원여부 판단을 위한 요청
+        val service = retrofit.create(LoginService::class.java)
+        val call =
+            if (isKakaoLogin){
+                service.loginFromKakao(MemberDTO(email))
+            }else{
+                if(password!=null){
+                    service.login(MemberDTO(email,password))
+                } else {
+                    return
+                }
+            }
+        call.enqueue(object : Callback<MemberDTO?>{
+            override fun onResponse(call: Call<MemberDTO?>, response: Response<MemberDTO?>) {
+                member = response.body()!!
+            }
+            override fun onFailure(call: Call<MemberDTO?>, t: Throwable) {
+                Log.i("com.kosmo.uncrowded","멤버 데이터 끌어오기 실패")
+            }
+        })
     }
 
 }
