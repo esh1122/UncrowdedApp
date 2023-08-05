@@ -71,7 +71,7 @@ dependencies {
 
     // Retrofit2
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0"
 
     // Rx
     implementation 'io.reactivex.rxjava3:rxkotlin:3.0.0'
@@ -102,5 +102,11 @@ dependencies {
 
     //dialog
     implementation 'com.orhanobut:dialogplus:1.11@aar'
+
+    //코틀린 데이터 serialization
+    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1'
+
+    //카카오 로그인
+    implementation "com.kakao.sdk:v2-user:2.15.0"
 
 }
