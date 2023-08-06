@@ -1,3 +1,6 @@
 package com.kosmo.uncrowded.model
 
-data class FavoriteDTO(var email : String = "", var location_poi : Int = -1)
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class FavoriteDTO(val email : String = "", val location_poi : Int = -1)

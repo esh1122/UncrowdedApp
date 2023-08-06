@@ -1,71 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:padding="20dp"
-    tools:context=".LoginActivity">
-
-
-    <EditText
-        android:background="#55FFD700"
-        android:id="@+id/id"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginBottom="5dp"
-        android:hint="아이디를 입력하세요?"
-        android:textSize="20sp"
-        android:gravity="center"
-        />
-
-
-    <EditText
-        android:gravity="center"
-        android:textSize="20sp"
-        android:background="#55FFD700"
-        android:layout_marginBottom="10dp"
-        android:id="@+id/pwd"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:hint="비밀번호를 입력하세요?"
-        android:inputType="textPassword"
-        />
+    tools:context=".MainActivity">
 
     <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <ImageView
+            android:layout_weight="4"
+            android:src="@drawable/login_background"
+            android:scaleType="centerCrop"
+            android:layout_width="match_parent"
+            android:layout_height="0dp" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="right"
-        android:orientation="vertical"
+        android:orientation="vertical">
 
-        >
-        <!--Theme.MaterialComponents.DayNight.DarkActionBar
-        는 버튼의 백그라운드가 무시됨. 즉 Theme.AppCompat.Light.DarkActionBar로테마변경-->
-        <Button
-            android:id="@+id/btn_login"
-            android:layout_width="300dp"
-            android:layout_height="50dp"
-            android:layout_gravity="center"
-            android:textAlignment="center"
-            android:background="@color/black"
-
-            />
         <TextView
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:textAlignment="center"
-            android:layout_marginTop="25dp"
-            android:text="또는"
-            android:fontFamily="@font/pretendard_medium"/>
+            android:layout_margin="150dp"
+            android:textStyle="bold"
+            android:textSize="40sp"
+            android:textColor="#fff"
+            android:text="Login"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <EditText
+            android:textColor="#fff"
+            android:textColorHint="#eee"
+            android:paddingStart="10dp"
+            android:paddingLeft="10dp"
+            android:hint="Email"
+            android:id="@+id/email"
+            android:layout_margin="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="?actionBarSize"
+            android:background="#33000000"
+            android:textSize="17sp" />
+        <EditText
+            android:textColor="#fff"
+            android:textColorHint="#eee"
+            android:paddingStart="10dp"
+            android:paddingLeft="10dp"
+            android:hint="Password"
+            android:id="@+id/password"
+            android:inputType="textPassword"
+            android:layout_margin="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="?actionBarSize"
+            android:background="#33000000"
+            android:textSize="17sp" />
+        <Button
+            android:paddingRight="20dp"
+            android:paddingLeft="20dp"
+            android:background="#333333"
+            android:text="로그인"
+            android:id="@+id/btn_uncrowded_login"
+            android:textColor="#777"
+            android:layout_width="200dp"
+            android:layout_height="30dp" />
         <ImageView
-            android:layout_gravity="center"
-            android:id="@+id/kakaoLogin"
-            android:layout_height="wrap_content"
-            android:layout_width="300dp"
+            android:layout_width="200dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="20dp"
+            android:id="@+id/btn_kakao_login"
             android:src="@drawable/kakao_login_large_wide"
-           />
+            />
     </LinearLayout>
-</LinearLayout>
+</RelativeLayout>

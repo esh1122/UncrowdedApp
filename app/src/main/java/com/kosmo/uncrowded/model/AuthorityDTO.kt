@@ -1,3 +1,6 @@
 package com.kosmo.uncrowded.model
 
-data class AuthorityDTO(var authorityCode : String="", var authorityName : String="")
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class AuthorityDTO(val authorityCode : String="", val authorityName : String="")
