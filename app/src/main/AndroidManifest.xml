@@ -51,7 +51,8 @@
         </activity>
         <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:windowSoftInputMode="adjustPan" >
 
         </activity>
         <meta-data android:name="com.kakao.sdk.AppKey" android:value="@string/kakao_native_key"/>
@@ -68,8 +69,9 @@
             </intent-filter>
         </activity>
         <service
-            android:name="com.google.firebase.messaging.FirebaseMessagingService"
-            android:exported="false">
+            android:name=".firebase.MyFirebaseMessagingService"
+            android:exported="true"
+            android:directBootAware="true">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>

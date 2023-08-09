@@ -9,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.kakao.sdk.auth.AuthApiClient
 import com.kakao.sdk.auth.model.OAuthToken
-import com.kakao.sdk.common.KakaoSdk
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.common.model.KakaoSdkError
@@ -18,7 +17,7 @@ import com.kakao.sdk.user.model.AccessTokenInfo
 import com.kakao.sdk.user.model.User
 import com.kakao.util.maps.helper.Utility
 import com.kosmo.uncrowded.databinding.ActivityLoginBinding
-import com.kosmo.uncrowded.login.service.LoginService
+import com.kosmo.uncrowded.retrofit.login.LoginService
 import com.kosmo.uncrowded.model.MemberDTO
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType

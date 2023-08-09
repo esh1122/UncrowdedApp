@@ -13,7 +13,7 @@ data class MemberDTO(
     val addr: String= "",
     val joinDate: String= "",
     val haschild: String= "",
-    val gu_code: String= "",
+    val gu_code: Int= -1,
     val addrLatitude: String= "",
     val addrLongitude: String= "",
     val token: String= "",

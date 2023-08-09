@@ -1,4 +1,4 @@
-package com.kosmo.uncrowded.login.service
+package com.kosmo.uncrowded.retrofit.login
 
 import retrofit2.Call
 import retrofit2.http.GET

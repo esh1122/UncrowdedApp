@@ -1,10 +1,8 @@
-package com.kosmo.uncrowded.login.service
+package com.kosmo.uncrowded.retrofit.login
 
 import com.kosmo.uncrowded.model.MemberDTO
 import retrofit2.Call
 import retrofit2.http.Body
-import retrofit2.http.Field
-import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
 
 interface LoginService {

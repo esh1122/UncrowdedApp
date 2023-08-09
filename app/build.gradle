@@ -57,6 +57,7 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:32.1.0')
     implementation 'com.google.firebase:firebase-messaging-ktx'
     implementation 'com.google.firebase:firebase-analytics-ktx'
+    implementation 'com.google.firebase:firebase-messaging-directboot:20.2.0'
 
     //iamport설정
     implementation 'com.github.iamport:iamport-android:v1.3.7'
@@ -109,5 +110,14 @@ dependencies {
 
     //카카오 로그인
     implementation "com.kakao.sdk:v2-user:2.15.0"
+
+    //recyclerview
+    implementation "androidx.recyclerview:recyclerview:1.2.1"
+    implementation "androidx.recyclerview:recyclerview-selection:1.1.0"
+
+    //피카소
+    implementation 'com.squareup.picasso:picasso:2.8'
+
+
 
 }

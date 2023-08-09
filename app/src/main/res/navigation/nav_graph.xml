@@ -9,18 +9,30 @@
         android:id="@+id/mainFragment"
         android:name="com.kosmo.uncrowded.view.MainFragment"
         android:label="fragment_main"
-        tools:layout="@layout/fragment_main" />
-
+        tools:layout="@layout/fragment_main" >
+        <action
+            android:id="@+id/action_mainFragment_to_detailLocationFragment"
+            app:destination="@id/detailLocationFragment" />
+    </fragment>
     <fragment
         android:id="@+id/eventFragment"
         android:name="com.kosmo.uncrowded.view.EventFragment"
         android:label="fragment_event"
-        tools:layout="@layout/fragment_event" />
+        tools:layout="@layout/fragment_event" >
+        <action
+            android:id="@+id/action_eventFragment_to_detailEventFragment"
+            app:destination="@id/detailEventFragment" >
+        </action>
+    </fragment>
     <fragment
         android:id="@+id/locationFragment"
         android:name="com.kosmo.uncrowded.view.LocationFragment"
         android:label="fragment_location"
-        tools:layout="@layout/fragment_location" />
+        tools:layout="@layout/fragment_location" >
+        <action
+            android:id="@+id/action_locationFragment_to_detailLocationFragment"
+            app:destination="@id/detailLocationFragment" />
+    </fragment>
 
     <action
         android:id="@+id/action_to_mainFragment"
@@ -31,5 +43,23 @@
     <action
         android:id="@+id/action_to_locationFragment"
         app:destination="@id/locationFragment"/>
+    <fragment
+        android:id="@+id/detailEventFragment"
+        android:name="com.kosmo.uncrowded.view.DetailEventFragment"
+        android:label="fragment_detail_event"
+        tools:layout="@layout/fragment_detail_event" >
+        <argument
+            android:name="event"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/detailLocationFragment"
+        android:name="com.kosmo.uncrowded.view.DetailLocationFragment"
+        android:label="fragment_detail_location"
+        tools:layout="@layout/fragment_detail_location" >
+        <argument
+            android:name="location_poi"
+            app:argType="string" />
+    </fragment>
 
 </navigation>

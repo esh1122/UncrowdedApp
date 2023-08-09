@@ -12,6 +12,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
+        super.onMessageReceived(remoteMessage)
+
         Log.d("com.kosmo.uncrowded.firebase", "From: ${remoteMessage.from}")
 
         // Check if message contains a data payload.

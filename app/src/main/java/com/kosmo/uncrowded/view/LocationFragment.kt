@@ -5,15 +5,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.kosmo.uncrowded.R
 import com.kosmo.uncrowded.databinding.FragmentLocationBinding
+import nl.joery.animatedbottombar.AnimatedBottomBar
 
-/**
- * A simple [Fragment] subclass.
- * Use the [LocationFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class LocationFragment : Fragment() {
 
     private var binding: FragmentLocationBinding? = null
@@ -25,5 +22,14 @@ class LocationFragment : Fragment() {
         binding = FragmentLocationBinding.inflate(layoutInflater)
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_location, container, false)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val activity = activity as AppCompatActivity?
+        if (activity != null) {
+            val bottomBar = activity.findViewById<AnimatedBottomBar>(R.id.bottom_bar)
+            bottomBar?.selectTabAt(1)
+        }
     }
 }

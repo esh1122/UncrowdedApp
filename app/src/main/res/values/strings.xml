@@ -9,4 +9,6 @@
     <string name="login_fast_api">http://192.168.0.33:8080/</string>
     <string name="token_password">config.auth</string>
     <string name="uncrowded_key">46553@!#$%^*(whd</string>
+    <string name="seoul_url">http://openapi.seoul.go.kr:8088/</string>
+    <string name="seoul_or_openapi_key">6f52694e6563686f39357975444753</string>
 </resources>

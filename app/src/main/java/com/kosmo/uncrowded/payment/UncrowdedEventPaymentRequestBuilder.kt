@@ -21,7 +21,7 @@ class UncrowdedEventPaymentRequestBuilder(eventDto: EventDTO, memberDto : Member
             pg = PG.kakaopay.makePgRawName(pgId = ""),           // PG 사
             pay_method = PayMethod.kakaopay.name,                // 결제수단
             name = eventDto.event_org_name,                         // 주문명
-            merchant_uid = "muid_aos_${eventDto.event_Code}",                 // 주문번호
+            merchant_uid = "muid_aos_${eventDto.event_code}",                 // 주문번호
             amount = "1000",                            // 결제금액
             buyer_name = memberDto.name,
             card = null, // 카드사 다이렉트
@@ -29,7 +29,7 @@ class UncrowdedEventPaymentRequestBuilder(eventDto: EventDTO, memberDto : Member
         return this
     }
 
-    fun payment(iamPortRequest: IamPortRequest,paymentResultCallback: (IamPortResponse?) -> Unit) {
+    fun payment(paymentResultCallback: (IamPortResponse?) -> Unit) {
         Iamport.payment(storeCode, iamPortRequest = iamPortRequest, paymentResultCallback = paymentResultCallback)
     }
 

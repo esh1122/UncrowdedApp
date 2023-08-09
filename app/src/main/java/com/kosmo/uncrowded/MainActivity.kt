@@ -1,18 +1,16 @@
 package com.kosmo.uncrowded
 
 import android.Manifest
-import android.app.Activity
-import android.app.AlertDialog
 import android.content.pm.PackageManager
+import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.view.DragAndDropPermissions
 import android.view.MenuItem
 import android.widget.ImageView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.GravityCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -22,12 +20,13 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.messaging.ktx.messaging
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.kakao.sdk.user.UserApiClient
 import com.kosmo.uncrowded.databinding.ActivityMainBinding
-import com.kosmo.uncrowded.login.service.KakaoService
-import com.kosmo.uncrowded.login.service.LoginService
+import com.kosmo.uncrowded.retrofit.login.LoginService
 import com.kosmo.uncrowded.model.MemberDTO
+import com.kosmo.uncrowded.view.MainFragmentDirections
 import io.multimoon.colorful.CAppCompatActivity
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -42,12 +41,16 @@ class MainActivity : CAppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var analytics: FirebaseAnalytics
     private lateinit var navController: NavController
-    private var permissions = mutableListOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.POST_NOTIFICATIONS)
-    private var canSendNoti = false
+    private val permissions = mutableListOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.POST_NOTIFICATIONS)
+    private val messagingTopics = mutableListOf<String>()
+
 
     private lateinit var member : MemberDTO
 
     private var isKakaoLogin = false
+
+    private lateinit var locationManager : LocationManager
+
 
     val fragmentMember : MemberDTO
         get() = member
@@ -64,7 +67,10 @@ class MainActivity : CAppCompatActivity() {
             UserApiClient.instance.me { user, error ->
                 if (user != null) {
                     val email = user.kakaoAccount!!.email!!
-                    getUncrowdedUserByEmail(email)
+                    getUncrowdedUserByEmail(email){
+                        member = it
+                        noficationSetting(it)
+                    }
                 }
             }
         }else{
@@ -72,7 +78,10 @@ class MainActivity : CAppCompatActivity() {
             val preferences = getSharedPreferences("usersInfo", MODE_PRIVATE)
             val email =preferences.getString("email",null)
             if (email != null) {
-                getUncrowdedUserByEmail(email)
+                getUncrowdedUserByEmail(email){
+                    member = it
+                    noficationSetting(it)
+                }
             }
         }
         //firebase
@@ -119,8 +128,15 @@ class MainActivity : CAppCompatActivity() {
             }
         }
 
+        locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
 
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+    }
+
+
 
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -196,7 +212,7 @@ class MainActivity : CAppCompatActivity() {
         if(sum != permissions.size) finish()
     }
 
-    private fun getUncrowdedUserByEmail(email : String,password : String? = null){
+    private fun getUncrowdedUserByEmail(email : String,password : String? = null, callback: (MemberDTO) -> Unit){
         val retrofit = Retrofit.Builder()
             .baseUrl(resources.getString(R.string.login_fast_api)) // Kakao API base URL
             .addConverterFactory(Json{
@@ -217,36 +233,41 @@ class MainActivity : CAppCompatActivity() {
             }
         call.enqueue(object : Callback<MemberDTO?>{
             override fun onResponse(call: Call<MemberDTO?>, response: Response<MemberDTO?>) {
-                member = response.body()!!
+                callback(response.body()!!)
             }
             override fun onFailure(call: Call<MemberDTO?>, t: Throwable) {
-                Log.i("com.kosmo.uncrowded","멤버 데이터 끌어오기 실패")
+                Log.i("com.kosmo.uncrowded","멤버 데이터 끌어오기 실패 : ${t.message}")
             }
         })
     }
 
+    private fun noficationSetting(member: MemberDTO){
+        if(NotificationManagerCompat.from(this@MainActivity).areNotificationsEnabled()){
+            val favorites = member.favorites!!
+            favorites.forEach {
+                if(!messagingTopics.contains("${it.location_poi}")){
+                    Firebase.messaging.subscribeToTopic("locationPOI${it.location_poi}")
+                        .addOnCompleteListener { task ->
+                            var msg = "Subscribed"
+                            if (!task.isSuccessful) {
+                                msg = "Subscribe failed"
+                            }
+                            messagingTopics.add("${it.location_poi}")
+                            Log.d("com.kosmo.uncrowded", "$msg locationPOI${it.location_poi}")
+                        }
+                }else{
+
+                }
+            }
+        }else {
+            return
+        }
+    }
+
+    companion object {
+        // 위치 업데이트 간격
+        private const val MIN_TIME_BETWEEN_UPDATES: Long = 10000 // 10초
+        private const val MIN_DISTANCE_CHANGE_FOR_UPDATES: Float = 10f // 10미터
+    }
+
 }
-//fire 베이스 구독과 구독 해지 메소드
-//            binding.favoriteBtn.setOnClickListener {
-//            if ((it as ToggleButton).isChecked){
-//                Firebase.messaging.subscribeToTopic("location052")
-//                    .addOnCompleteListener { task ->
-//                        var msg = "Subscribed"
-//                        if (!task.isSuccessful) {
-//                            msg = "Subscribe failed"
-//                        }
-//                        Log.d("com.kosmo.uncrowded", msg)
-//                        Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
-//                    }
-//            }else{
-//                Firebase.messaging.unsubscribeFromTopic("location052").addOnCompleteListener { task ->
-//                    var msg = "Unsubscribed"
-//                    if (!task.isSuccessful) {
-//                        msg = "Unsubscribed failed"
-//                    }
-//                    Log.d("com.kosmo.uncrowded", msg)
-//                    Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
-//                }
-//            }
-//        }
-//        Log.d("com.kosmo.uncrowded", "keyhash : ${Utility.getKeyHash(this)}")

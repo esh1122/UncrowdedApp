@@ -1,4 +1,4 @@
-package com.kosmo.uncrowded.adapter
+package com.kosmo.uncrowded.model.event
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -36,7 +36,6 @@ class EventSelectorAdapter(
         if (view == null) {
             view = layoutInflater.inflate(R.layout.simple_grid_item, parent, false)
 
-
             viewHolder = ViewHolder(
                 view.findViewById(R.id.text_view),
                 view.findViewById(R.id.image_view)
@@ -47,12 +46,16 @@ class EventSelectorAdapter(
         }
 
         val context = parent.context
+
         when (position) {
             0 -> {
                 viewHolder.textView.text = "추천순"
             }
             1 -> {
                 viewHolder.textView.text = "최신순"
+            }
+            2 -> {
+                viewHolder.textView.text = "가족동반"
             }
         }
 
