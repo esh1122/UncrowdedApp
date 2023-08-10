@@ -9,7 +9,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.NavHostFragment
@@ -23,14 +22,6 @@ import com.kosmo.uncrowded.retrofit.location.LocationService
 import com.kosmo.uncrowded.retrofit.main.AreaInfo
 import com.kosmo.uncrowded.retrofit.main.MapService
 import com.kosmo.uncrowded.retrofit.main.ResponseCityData
-import com.squareup.picasso.Picasso
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import net.daum.mf.map.api.CalloutBalloonAdapter
@@ -45,11 +36,9 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import java.io.IOException
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 
-class MainFragment : Fragment(), MapView.MapViewEventListener {
+class MainFragment : Fragment(), MapView.MapViewEventListener, MapView.POIItemEventListener {
     private var binding : FragmentMainBinding? = null
     private lateinit var mapView : MapView
     private lateinit var locationManager : LocationManager
@@ -110,15 +99,16 @@ class MainFragment : Fragment(), MapView.MapViewEventListener {
         if(!isListening){
             mapView.setMapViewEventListener(this)
         }
+        mapView.setPOIItemEventListener(this)
     }
 
     override fun onPause() {
         super.onPause()
-        (binding!!.mapView as ViewGroup).removeAllViews();
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        (binding?.mapView as ViewGroup).removeAllViews()
         binding = null
         if (isListening) {
             locationManager.removeUpdates(locationListener)
@@ -138,19 +128,15 @@ class MainFragment : Fragment(), MapView.MapViewEventListener {
                     val areaInfo = it.SeoulRtd[0]
                     when(areaInfo.AREA_CONGEST_LVL){
                         "붐빔" ->{
-                            areaInfo.AREA_CONGEST_LVL = "위험"
                             color = Color.parseColor("#80FF0000")
                         }
                         "약간 붐빔" ->{
-                            areaInfo.AREA_CONGEST_LVL = "약간 위험"
                             color = Color.parseColor("#80FF8000")
                         }
                         "보통"->{
-                            areaInfo.AREA_CONGEST_LVL = "보통"
                             color = Color.parseColor("#80deec10")
                         }
                         else ->{
-                            areaInfo.AREA_CONGEST_LVL = "안전"
                             color = Color.parseColor("#8000FF00")
                         }
                     }
@@ -198,6 +184,33 @@ class MainFragment : Fragment(), MapView.MapViewEventListener {
     override fun onMapViewMoveFinished(p0: MapView?, p1: MapPoint?) {
 
     }
+
+    override fun onPOIItemSelected(p0: MapView?, p1: MapPOIItem?) {
+
+    }
+
+    override fun onCalloutBalloonOfPOIItemTouched(p0: MapView?, p1: MapPOIItem?) {
+
+    }
+
+    override fun onCalloutBalloonOfPOIItemTouched(
+        p0: MapView?,
+        p1: MapPOIItem?,
+        p2: MapPOIItem.CalloutBalloonButtonType?
+    ) {
+        Log.i("Main.Balloon","Balloon 리스너 호출")
+        p1?.let { p1->
+            val jsonString = Json.encodeToString(p1.userObject as LocationDTO)
+            val action = MainFragmentDirections.actionMainFragmentToDetailLocationFragment(jsonString)
+            // NavController를 통해 ReceiverFragment로 이동하면서 데이터를 전송합니다.
+            NavHostFragment.findNavController(this@MainFragment).navigate(action)
+        }
+    }
+
+    override fun onDraggablePOIItemMoved(p0: MapView?, p1: MapPOIItem?, p2: MapPoint?) {
+
+    }
+
 
     private fun parseJsonFile(): List<Feature>? {
         val jsonText: String
@@ -309,26 +322,17 @@ class MainFragment : Fragment(), MapView.MapViewEventListener {
                     it.congest_level = areaInfo.AREA_CONGEST_LVL
                     p0.userObject = it
 
-                    CoroutineScope(Dispatchers.Main).launch {
-                        Picasso.get()
-                            .load(location.location_image_string)
-                            .placeholder(R.drawable.ex_poster_image)
-                            .resize(120, 81)
-                            .centerCrop()
-                            .error(R.drawable.close)
-                            .into(rootView.findViewById<ImageView>(R.id.locationImage))
-                    }
-                    binding.locationName.text = "${p0.itemName}"
-                    binding.locationLevel.text = "${location.congest_level}"
-                    binding.root.setOnClickListener {
-                        val jsonString = Json.encodeToString(it)
-                        val action = MainFragmentDirections.actionMainFragmentToDetailLocationFragment(jsonString)
-                        // NavController를 통해 ReceiverFragment로 이동하면서 데이터를 전송합니다.
-                        NavHostFragment.findNavController(this@MainFragment).navigate(action)
-                    }
+//                    Glide.with(binding.root)
+//                        .load(location.location_image_string)
+//                        .into(binding.locationImage)
+//                    val params = binding.balloon.layoutParams
+//                    params.width = ViewGroup.LayoutParams.WRAP_CONTENT
+//                    binding.locationName.text = "${p0.itemName}"
+//                    binding.locationLevel.text = "${location.congest_level}"
+
                 }
             }
-
+            Log.i("Main.Balloon","풍선 뷰 리턴")
             return rootView
         }
 
@@ -336,10 +340,5 @@ class MainFragment : Fragment(), MapView.MapViewEventListener {
             return null
         }
 
-
-    }
-
-    private interface ImageLoadCallback {
-        fun onImageLoaded(p0: MapPOIItem, location: LocationDTO, image: Bitmap)
     }
 }

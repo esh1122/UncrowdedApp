@@ -6,6 +6,6 @@ import kotlinx.serialization.Serializable
 data class FavoriteDTO(
     val email : String = "",
     val location_poi : String = "",
-    val crowdLvl : Int = 0,
+    val crowdlvl : Int = 0,
     val subscribe_date : String = ""
 )

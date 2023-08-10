@@ -11,4 +11,6 @@
     <string name="uncrowded_key">46553@!#$%^*(whd</string>
     <string name="seoul_url">http://openapi.seoul.go.kr:8088/</string>
     <string name="seoul_or_openapi_key">6f52694e6563686f39357975444753</string>
+    <string name="gong_gong_api_key">2YWi4K1shUr6BH1Il%2F31XJB3oBlPGCL4aqbwjntb7dt%2BRdLnUoSGp5cIYM5a9RyJZmTUGEFfn5AQK%2FPjWi0ClA%3D%3D</string>
+    <string name="gong_gong_api">http://apis.data.go.kr/</string>
 </resources>

@@ -20,8 +20,7 @@ class LocationFragment : Fragment() {
     ): View? {
         Log.i("com.kosmo.uncrowded","LocationFragment 생성")
         binding = FragmentLocationBinding.inflate(layoutInflater)
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_location, container, false)
+        return binding?.root
     }
 
     override fun onStart() {

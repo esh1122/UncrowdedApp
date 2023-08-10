@@ -16,53 +16,112 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         android:padding="5dp">
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
             <ImageView
+                android:id="@+id/detail_location_image"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/detail_location"
-                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintVertical_bias="0.05"/>
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.05" />
+
             <ImageView
+                android:id="@+id/location_bookmark"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:src="@drawable/unclicked_bookmark"
-                android:id="@+id/location_bookmark"
                 android:scaleType="fitXY"
-                app:layout_constraintTop_toTopOf="parent"
+                android:src="@drawable/unclicked_bookmark"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_bias="0.9"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintVertical_bias="0.1"
-                app:layout_constraintHorizontal_bias="0.9"
-                />
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.1" />
+
             <TextView
+                android:id="@+id/detail_location_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="장 소"
                 android:fontFamily="@font/pretendard_extrabold"
-                android:id="@+id/detail_location_name"
-                app:layout_constraintTop_toBottomOf="@id/detail_location"
+                android:text="장 소"
+                android:textSize="20sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                android:textSize="20sp"
-                app:layout_constraintVertical_bias="0"/>
+                app:layout_constraintTop_toBottomOf="@id/detail_location_image"
+                app:layout_constraintVertical_bias="0" />
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/detail_location"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/detail_location_name"
                 app:layout_constraintVertical_bias="0.1">
 
+                <androidx.cardview.widget.CardView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="#348FB8"
+                    android:layout_marginRight="20dp">
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/pretendard_black"
+                            android:padding="5dp"
+                            android:text="실시간 생활/유동인구" />
+
+                        <TextView
+                            android:id="@+id/realtime_population"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/pretendard_black"
+                            android:padding="5dp"
+                            android:layout_gravity="center"
+                            android:text="0" />
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="#348FB8">
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/pretendard_black"
+                            android:padding="5dp"
+                            android:text="머신러닝 유동인구" />
+
+                        <TextView
+                            android:id="@+id/machine_learning_population"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/pretendard_black"
+                            android:padding="5dp"
+                            android:layout_gravity="center"
+                            android:text="0" />
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+                </androidx.cardview.widget.CardView>
             </androidx.appcompat.widget.LinearLayoutCompat>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>

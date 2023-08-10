@@ -45,8 +45,6 @@ class EventSelectorAdapter(
             viewHolder = view.tag as ViewHolder
         }
 
-        val context = parent.context
-
         when (position) {
             0 -> {
                 viewHolder.textView.text = "추천순"
