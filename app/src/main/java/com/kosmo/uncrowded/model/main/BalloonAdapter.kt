@@ -1,15 +1,9 @@
 package com.kosmo.uncrowded.model.main
 
-import android.graphics.BitmapFactory
-import android.util.Base64
 import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.kosmo.uncrowded.R
 import com.kosmo.uncrowded.databinding.CustomCalloutBalloonBinding
-import com.kosmo.uncrowded.databinding.KakaoMapBalloonLayoutBinding
 import com.kosmo.uncrowded.model.LocationDTO
 import com.kosmo.uncrowded.retrofit.main.AreaInfo
 import com.squareup.picasso.Picasso

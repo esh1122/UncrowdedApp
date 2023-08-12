@@ -23,6 +23,7 @@ import com.kosmo.uncrowded.model.event.EventDTO
 import com.kosmo.uncrowded.model.event.EventRecyclerViewAdapter
 import com.kosmo.uncrowded.model.event.EventRecyclerViewDecoration
 import com.kosmo.uncrowded.model.event.EventSelectorAdapter
+import com.kosmo.uncrowded.model.event.EventSortMenuCode
 import com.kosmo.uncrowded.retrofit.event.EventService
 import com.orhanobut.dialogplus.DialogPlus
 import com.orhanobut.dialogplus.GridHolder
@@ -40,20 +41,20 @@ class EventFragment : Fragment() {
     private lateinit var context : Context
     private var binding: FragmentEventBinding? = null
     private lateinit var dialog : DialogPlus
-    private val spinnerItems = arrayOf("추천순","최신순","자녀동반")
+    private val spinnerItems = EventSortMenuCode.values()
             
     override fun onAttach(context: Context) {
         super.onAttach(context)
         this.context = context
-        val callback = object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                // 백 버튼이 눌렸을 때의 동작 처리
-                if (handleBackPress()) return
-                isEnabled = false
-                requireActivity().onBackPressed()
-            }
-        }
-        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
+//        val callback = object : OnBackPressedCallback(true) {
+//            override fun handleOnBackPressed() {
+//                // 백 버튼이 눌렸을 때의 동작 처리
+//                if (handleBackPress()) return
+//                isEnabled = false
+//                requireActivity().onBackPressed()
+//            }
+//        }
+//        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
     }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -61,25 +62,24 @@ class EventFragment : Fragment() {
     ): View? {
         Log.i("com.kosmo.uncrowded","EventFragment 생성")
         binding = FragmentEventBinding.inflate(inflater,container,false)
-        val adapter = EventSelectorAdapter(context, false, 3)
-        getEvent(spinnerItems[0])
-
+        val adapter = EventSelectorAdapter(context, false, spinnerItems.size)
+        getEvent(spinnerItems[0].name.lowercase())
         binding?.let { binding ->
-
             dialog = DialogPlus.newDialog(context).apply {
-                setContentHolder(GridHolder(1))
+                setContentHolder(GridHolder(3))
                 isCancelable = true
                 setGravity(Gravity.BOTTOM)
+                setHeader(R.layout.header_layout)
                 setAdapter(adapter)
                 setOnItemClickListener { dialog, item, view, position ->
-                    binding.eventSpinner.text = spinnerItems[position]
-                    getEvent(spinnerItems[position])
+                    binding.eventSpinner.text = spinnerItems[position].target
+                    getEvent(spinnerItems[position].name.lowercase())
                     dialog.dismiss()
                 }
                 setContentHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
             }.create()
 
-            binding.eventSpinner.text = spinnerItems[0]
+            binding.eventSpinner.text = spinnerItems[0].target
             binding.eventSpinner.setOnClickListener { v->
                 dialog.show()
             }
@@ -118,7 +118,7 @@ class EventFragment : Fragment() {
             }.asConverterFactory("application/json".toMediaType()))
             .build() //스프링 REST API로 회원여부 판단을 위한 요청
         val service = retrofit.create(EventService::class.java)
-        val call = service.getEvents("recent")
+        val call = service.getEvents(requirement)
         call.enqueue(object : Callback<MutableList<EventDTO>>{
             override fun onResponse(
                 call: Call<MutableList<EventDTO>>,
@@ -127,10 +127,8 @@ class EventFragment : Fragment() {
                 val events = response.body()!!
                 val adapter = EventRecyclerViewAdapter(this@EventFragment,events)
                 binding?.let { binding->
-                    val linearLayoutManager = LinearLayoutManager(this@EventFragment.activity, RecyclerView.VERTICAL,false)
-                    linearLayoutManager.isSmoothScrollbarEnabled = false
                     binding.eventList.adapter = adapter
-                    binding.eventList.addItemDecoration(EventRecyclerViewDecoration(60))
+                    binding.eventList.addItemDecoration(EventRecyclerViewDecoration(0,60))
                     binding.eventList.layoutManager = LinearLayoutManager(this@EventFragment.activity, RecyclerView.VERTICAL,false)
                 }
             }
@@ -152,7 +150,7 @@ class EventFragment : Fragment() {
             .build() //스프링 REST API로 회원여부 판단을 위한 요청
         binding?.let { binding ->
             val service = retrofit.create(EventService::class.java)
-            val call = service.getSearchedEvents(binding!!.searchEvent.text.toString())
+            val call = service.getSearchedEvents(binding.searchEvent.text.toString())
             call.enqueue(object : Callback<MutableList<EventDTO>?> {
                 override fun onResponse(
                     call: Call<MutableList<EventDTO>?>,
@@ -162,45 +160,19 @@ class EventFragment : Fragment() {
                     val events = response.body() ?: return AlertDialog.Builder(context)
                         .setTitle("이벤트를 찾을 수 없습니다").setCancelable(true).create().show()
                     val adapter = EventRecyclerViewAdapter(this@EventFragment, events)
-
-
-                    val linearLayoutManager = LinearLayoutManager(
-                        this@EventFragment.activity,
-                        RecyclerView.VERTICAL,
-                        false
-                    )
-                    linearLayoutManager.isSmoothScrollbarEnabled = false
                     binding.eventList.adapter = adapter
-                    binding.eventList.addItemDecoration(EventRecyclerViewDecoration(60))
+                    binding.eventList.addItemDecoration(EventRecyclerViewDecoration(0,60))
                     binding.eventList.layoutManager = LinearLayoutManager(
                         this@EventFragment.activity,
                         RecyclerView.VERTICAL,
                         false
                     )
-
                 }
 
                 override fun onFailure(call: Call<MutableList<EventDTO>?>, t: Throwable) {
                     Log.i("com.kosmo.uncrowded.event", "eventDto 전송 실패 ${t.message}")
                 }
-
             })
         }
-    }
-
-    private fun handleBackPress(): Boolean {
-        val currentFocus = activity?.currentFocus
-        Log.i("event","currentFocus is EditText : ${currentFocus is EditText}")
-        if (currentFocus is EditText) {
-            // 키보드 감추기
-
-            val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-            imm?.hideSoftInputFromWindow(currentFocus.windowToken, 0)
-
-            // 포커스 제거
-            currentFocus.clearFocus()
-            return true
-        }
-        return false
     }
 }

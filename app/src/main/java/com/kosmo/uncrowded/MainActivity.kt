@@ -8,6 +8,8 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.widget.ImageView
+import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
@@ -27,6 +29,7 @@ import com.kosmo.uncrowded.databinding.ActivityMainBinding
 import com.kosmo.uncrowded.retrofit.login.LoginService
 import com.kosmo.uncrowded.model.MemberDTO
 import com.kosmo.uncrowded.view.MainFragmentDirections
+import com.squareup.picasso.Picasso
 import io.multimoon.colorful.CAppCompatActivity
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -44,7 +47,6 @@ class MainActivity : CAppCompatActivity() {
     private val permissions = mutableListOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.POST_NOTIFICATIONS)
     private val messagingTopics = mutableListOf<String>()
 
-
     private lateinit var member : MemberDTO
 
     private var isKakaoLogin = false
@@ -61,28 +63,11 @@ class MainActivity : CAppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        if(intent.getStringExtra("kakao") == resources.getString(R.string.uncrowded_key)){
-            isKakaoLogin = true
-            Log.i("com.kosmo.uncrowded","email 처리 : kakao")
-            UserApiClient.instance.me { user, error ->
-                if (user != null) {
-                    val email = user.kakaoAccount!!.email!!
-                    getUncrowdedUserByEmail(email){
-                        member = it
-                        noficationSetting(it)
-                    }
-                }
-            }
-        }else{
-            Log.i("com.kosmo.uncrowded","email 처리 : preferences")
-            val preferences = getSharedPreferences("usersInfo", MODE_PRIVATE)
-            val email =preferences.getString("email",null)
-            if (email != null) {
-                getUncrowdedUserByEmail(email){
-                    member = it
-                    noficationSetting(it)
-                }
-            }
+        setMember {
+            Picasso.get().load("${resources.getString(R.string.login_fast_api)}profile_image?email=${it.email}")
+                .into(binding.drawerLayout.findViewById<ImageView>(R.id.profile_image))
+            binding.drawerLayout.findViewById<TextView>(R.id.profile_email).text = it.email
+            binding.drawerLayout.findViewById<TextView>(R.id.profile_name).text = it.name
         }
         //firebase
         analytics = Firebase.analytics
@@ -110,10 +95,6 @@ class MainActivity : CAppCompatActivity() {
         navController = navHostFragment.navController
 
         val headerView = binding.navigationView.getHeaderView(0)
-        headerView.findViewById<ImageView>(R.id.close).setOnClickListener {
-            binding.drawerLayout.closeDrawer(GravityCompat.START)
-        }
-
         binding.bottomBar.onTabSelected = {
             when(it.title){
                 "Main"->{
@@ -134,14 +115,6 @@ class MainActivity : CAppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-    }
-
-
-
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
-        return super.onOptionsItemSelected(item)
     }
 
 
@@ -263,6 +236,45 @@ class MainActivity : CAppCompatActivity() {
             return
         }
     }
+
+    fun setMember(callback: (MemberDTO) -> Unit){
+        if(intent.getStringExtra("kakao") == resources.getString(R.string.uncrowded_key)){
+            isKakaoLogin = true
+            Log.i("com.kosmo.uncrowded","email 처리 : kakao")
+            UserApiClient.instance.me { user, error ->
+                if (user != null) {
+                    val email = user.kakaoAccount!!.email!!
+                    getUncrowdedUserByEmail(email){
+                        member = it
+                        noficationSetting(it)
+                        callback(it)
+                    }
+                }
+            }
+        }else{
+            Log.i("com.kosmo.uncrowded","email 처리 : preferences")
+            val preferences = getSharedPreferences("usersInfo", MODE_PRIVATE)
+            val email =preferences.getString("email",null)
+            if (email != null) {
+                getUncrowdedUserByEmail(email){
+                    member = it
+                    noficationSetting(it)
+                    callback(it)
+                }
+            }
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        //코드로 등록한
+        when(item.itemId){
+            android.R.id.home -> {
+                binding.drawerLayout.openDrawer(GravityCompat.START)//xml설정(android:layout_gravity)과 같아야한다
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
 
     companion object {
         // 위치 업데이트 간격

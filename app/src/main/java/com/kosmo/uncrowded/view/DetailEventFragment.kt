@@ -22,16 +22,6 @@ import com.kosmo.uncrowded.payment.UncrowdedEventPaymentRequestBuilder
 import com.squareup.picasso.Picasso
 import kotlinx.serialization.json.Json
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [DetailEventFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class DetailEventFragment : Fragment() {
 
     private var binding: FragmentDetailEventBinding? = null

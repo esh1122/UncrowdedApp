@@ -80,6 +80,7 @@ class MainFragment : Fragment(), MapView.MapViewEventListener, MapView.POIItemEv
         }catch (e : SecurityException){
             e.printStackTrace()
         }
+        setPOI()
         return binding!!.root
     }
 
@@ -103,10 +104,12 @@ class MainFragment : Fragment(), MapView.MapViewEventListener, MapView.POIItemEv
     }
 
     override fun onPause() {
+        Log.i("MainFragment","MainFragment onDestroyView 호출")
         super.onPause()
     }
 
     override fun onDestroyView() {
+        Log.i("MainFragment","MainFragment onDestroyView 호출")
         super.onDestroyView()
         (binding?.mapView as ViewGroup).removeAllViews()
         binding = null
@@ -117,40 +120,7 @@ class MainFragment : Fragment(), MapView.MapViewEventListener, MapView.POIItemEv
     }
 
     override fun onMapViewInitialized(mapView: MapView?) {
-        val list = parseJsonFile()
-        Log.i("MainFragment","list의 크기 : ${list?.size}")
-        Log.i("MainFragment","mapView? : $mapView")
-        list?.forEachIndexed  { index,feature ->
-            getCrowdLvlFromApi(feature.properties.AREA_NM){responseCityData->
-                val color : Int
-//                Log.i("MainFragment","responseCityData : $responseCityData")
-                responseCityData?.let {
-                    val areaInfo = it.SeoulRtd[0]
-                    when(areaInfo.AREA_CONGEST_LVL){
-                        "붐빔" ->{
-                            color = Color.parseColor("#80FF0000")
-                        }
-                        "약간 붐빔" ->{
-                            color = Color.parseColor("#80FF8000")
-                        }
-                        "보통"->{
-                            color = Color.parseColor("#80deec10")
-                        }
-                        else ->{
-                            color = Color.parseColor("#8000FF00")
-                        }
-                    }
-                    val circle = makeCircle(feature.center[1],feature.center[0],color,index) //0부터 태그 시작
-                    circles.add(circle)
-                    
-                    val marker = makeMarker(feature.center[1],feature.center[0],feature.properties.AREA_NM,areaInfo,index) //1000부터 태그 시작
-                    markers.add(marker)
 
-                    mapView?.addPOIItem(marker)
-                    mapView?.addCircle(circle)
-                }
-            }
-        }
     }
 
     override fun onMapViewCenterPointMoved(p0: MapView?, p1: MapPoint?) {
@@ -211,6 +181,42 @@ class MainFragment : Fragment(), MapView.MapViewEventListener, MapView.POIItemEv
 
     }
 
+    private fun setPOI(){
+        val list = parseJsonFile()
+        Log.i("MainFragment","list의 크기 : ${list?.size}")
+        Log.i("MainFragment","mapView? : $mapView")
+        list?.forEachIndexed  { index,feature ->
+            getCrowdLvlFromApi(feature.properties.AREA_NM){responseCityData->
+                val color : Int
+//                Log.i("MainFragment","responseCityData : $responseCityData")
+                responseCityData?.let {
+                    val areaInfo = it.SeoulRtd[0]
+                    when(areaInfo.AREA_CONGEST_LVL){
+                        "붐빔" ->{
+                            color = Color.parseColor("#80FF0000")
+                        }
+                        "약간 붐빔" ->{
+                            color = Color.parseColor("#80FF8000")
+                        }
+                        "보통"->{
+                            color = Color.parseColor("#80deec10")
+                        }
+                        else ->{
+                            color = Color.parseColor("#8000FF00")
+                        }
+                    }
+                    val circle = makeCircle(feature.center[1],feature.center[0],color,index) //0부터 태그 시작
+                    circles.add(circle)
+
+                    val marker = makeMarker(feature.center[1],feature.center[0],feature.properties.AREA_NM,areaInfo,index) //1000부터 태그 시작
+                    markers.add(marker)
+
+                    mapView.addPOIItem(marker)
+                    mapView.addCircle(circle)
+                }
+            }
+        }
+    }
 
     private fun parseJsonFile(): List<Feature>? {
         val jsonText: String
@@ -255,7 +261,7 @@ class MainFragment : Fragment(), MapView.MapViewEventListener, MapView.POIItemEv
 
     private fun getLocations(callback: (List<LocationDTO>?) -> Unit){
         val retrofit = Retrofit.Builder()
-            .baseUrl(resources.getString(R.string.login_fast_api)) // Kakao API base URL
+            .baseUrl(resources.getString(R.string.login_fast_api))
             .addConverterFactory(Json{
                 ignoreUnknownKeys = true
                 coerceInputValues = true
@@ -303,7 +309,6 @@ class MainFragment : Fragment(), MapView.MapViewEventListener, MapView.POIItemEv
             0.5f,
             1.0f
         ) // 마커 이미지중 기준이 되는 위치(앵커포인트) 지정 - 마커 이미지 좌측 상단 기준 x(0.0f ~ 1.0f), y(0.0f ~ 1.0f) 값.
-        
         return customMarker
     }
 
@@ -325,10 +330,8 @@ class MainFragment : Fragment(), MapView.MapViewEventListener, MapView.POIItemEv
 //                    Glide.with(binding.root)
 //                        .load(location.location_image_string)
 //                        .into(binding.locationImage)
-//                    val params = binding.balloon.layoutParams
-//                    params.width = ViewGroup.LayoutParams.WRAP_CONTENT
-//                    binding.locationName.text = "${p0.itemName}"
-//                    binding.locationLevel.text = "${location.congest_level}"
+                    binding.locationName.text = "${p0.itemName}"
+                    binding.locationLevel.text = "${location.congest_level}"
 
                 }
             }

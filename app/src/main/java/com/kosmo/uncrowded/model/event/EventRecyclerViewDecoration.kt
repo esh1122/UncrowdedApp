@@ -5,11 +5,9 @@ import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 
 class EventRecyclerViewDecoration(
-    bottom : Int
+    private val right : Int,
+    private val bottom : Int
 ) : RecyclerView.ItemDecoration() {
-
-    private val bottom = bottom
-
     override fun getItemOffsets(
         outRect: Rect,
         view: View,
@@ -17,6 +15,7 @@ class EventRecyclerViewDecoration(
         state: RecyclerView.State
     ) {
         super.getItemOffsets(outRect, view, parent, state)
+        outRect.right = right
         outRect.bottom = bottom
     }
 }

@@ -1,38 +1,36 @@
 package com.kosmo.uncrowded.view
 
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.ktx.messaging
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.kosmo.uncrowded.MainActivity
 import com.kosmo.uncrowded.R
 import com.kosmo.uncrowded.databinding.FragmentDetailLocationBinding
 import com.kosmo.uncrowded.model.FavoriteDTO
 import com.kosmo.uncrowded.model.LocationDTO
+import com.kosmo.uncrowded.model.LocationDetailDTO
 import com.kosmo.uncrowded.model.ResponseResultSuccess
+import com.kosmo.uncrowded.model.event.EventRecyclerViewAdapter
+import com.kosmo.uncrowded.model.event.EventRecyclerViewDecoration
 import com.kosmo.uncrowded.retrofit.location.LocationService
 import com.kosmo.uncrowded.retrofit.member.MemberService
 import com.squareup.picasso.Picasso
-import kotlinx.datetime.Clock
-import kotlinx.datetime.DateTimeUnit
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.minus
-import kotlinx.datetime.toJavaLocalDate
-import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
-import java.time.format.DateTimeFormatter
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -59,20 +57,50 @@ class DetailLocationFragment : Fragment() {
                     false
                 }
             if(isChecked) binding.locationBookmark.setImageResource(R.drawable.clicked_bookmark)
-            Log.i("DetailLocation","이미지 url:${location.location_image_string}")
-            Picasso.get().load(location.location_image_string).into(binding.detailLocationImage)
 
+            Picasso.get().load(location.location_image_string).into(binding.detailLocationImage)
+            binding.detailLocationName.text = location.location_name
             binding.locationBookmark.setOnClickListener {
                 updateFavorite((requireActivity() as MainActivity).fragmentMember.email,location.location_poi){
                     val dialog = AlertDialog.Builder(this.requireContext())
                         .setTitle("즐겨찾기 변경")
                     if(it.isSuccess){
-                        dialog.setMessage("즐겨찾기 변경에 성공했습니다").show()
-                        binding.locationBookmark.setImageResource(if (isChecked) R.drawable.unclicked_bookmark else R.drawable.clicked_bookmark)
-                        isChecked = false
+                        dialog.setMessage(it.message).show()
+                        if (isChecked){
+                            binding.locationBookmark.setImageResource(R.drawable.unclicked_bookmark)
+                            Firebase.messaging.unsubscribeFromTopic("locationPOI${location.location_poi}")
+                        }else{
+                            binding.locationBookmark.setImageResource(R.drawable.clicked_bookmark)
+                            Firebase.messaging.subscribeToTopic("locationPOI${location.location_poi}")
+                        }
+//                        (requireActivity() as MainActivity).setMember(){
+//
+//                        }
+                        isChecked = !isChecked
                     }else{
-                        dialog.setMessage("즐겨찾기 변경에 실패했습니다").show()
+                        dialog.setMessage(it.message).show()
                     }
+                }
+            }
+
+            getDetailData(location.location_poi){
+                Log.i("DetailLocationFragment","날씨 : ${it.precpt_type}")
+                val weatherImage = when(it.precpt_type){
+                    "비"-> R.drawable.ic_rain
+                    "흐림"-> R.drawable.ic_cloud
+                    "낙뢰"-> R.drawable.ic_lightning
+                    "눈"->R.drawable.ic_snow
+                    else -> R.drawable.ic_brightness
+                }
+                binding.locationWeather.setImageResource(weatherImage)
+                binding.machineLearningPopulation.text = "${it.area_ppltn_avg}"
+                it.events?.let { events->
+                    val adapter = EventRecyclerViewAdapter(this,events)
+                    val linearLayoutManager = LinearLayoutManager(this.activity, RecyclerView.HORIZONTAL,false)
+                    linearLayoutManager.isSmoothScrollbarEnabled = false
+                    binding.locationDetailRecyclerView.adapter = adapter
+                    binding.locationDetailRecyclerView.addItemDecoration(EventRecyclerViewDecoration(60,0))
+                    binding.locationDetailRecyclerView.layoutManager = linearLayoutManager
                 }
             }
         }
@@ -86,9 +114,9 @@ class DetailLocationFragment : Fragment() {
                 ignoreUnknownKeys = true
                 coerceInputValues = true
             }.asConverterFactory("application/json".toMediaType()))
-            .build() //스프링 REST API로 회원여부 판단을 위한 요청
+            .build()
         val service = retrofit.create(MemberService::class.java)
-        val call = service.updateMemberFavorite(email,locationPoi)
+        val call = service.updateMemberFavorite(FavoriteDTO(email,locationPoi))
         call.enqueue(object : Callback<ResponseResultSuccess>{
             override fun onResponse(
                 call: Call<ResponseResultSuccess>,
@@ -105,8 +133,29 @@ class DetailLocationFragment : Fragment() {
         })
     }
 
-    private fun getRealtimePopulation(){
+    private fun getDetailData(location_poi: String,callback:(LocationDetailDTO)->Unit){
+        val retrofit = Retrofit.Builder()
+            .baseUrl(resources.getString(R.string.login_fast_api)) // Kakao API base URL
+            .addConverterFactory(Json {
+                ignoreUnknownKeys = true
+                coerceInputValues = true
+            }.asConverterFactory("application/json".toMediaType()))
+            .build()
+        val service = retrofit.create(LocationService::class.java)
+        val call = service.getLocationDetail(location_poi)
+        call.enqueue(object : Callback<LocationDetailDTO>{
+            override fun onResponse(
+                call: Call<LocationDetailDTO>,
+                response: Response<LocationDetailDTO>
+            ) {
+                response.body()?.let { callback(it) }
+            }
 
+            override fun onFailure(call: Call<LocationDetailDTO>, t: Throwable) {
+                Log.i("DetailLocationFragment","전송 실패 : ${t.message}")
+            }
+
+        })
     }
 
 }

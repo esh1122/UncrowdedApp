@@ -16,7 +16,7 @@ class EventSelectorAdapter(
 ) : BaseAdapter() {
 
     private val layoutInflater: LayoutInflater = LayoutInflater.from(context)
-
+    private val sortMenu = EventSortMenuCode.values()
     override fun getCount(): Int {
         return count
     }
@@ -32,7 +32,7 @@ class EventSelectorAdapter(
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val viewHolder: ViewHolder
         var view: View? = convertView
-
+        val data = sortMenu[position]
         if (view == null) {
             view = layoutInflater.inflate(R.layout.simple_grid_item, parent, false)
 
@@ -45,17 +45,8 @@ class EventSelectorAdapter(
             viewHolder = view.tag as ViewHolder
         }
 
-        when (position) {
-            0 -> {
-                viewHolder.textView.text = "추천순"
-            }
-            1 -> {
-                viewHolder.textView.text = "최신순"
-            }
-            2 -> {
-                viewHolder.textView.text = "가족동반"
-            }
-        }
+        viewHolder.textView.text = data.target
+        viewHolder.imageView.setImageResource(data.drawableId)
 
         return view!!
     }

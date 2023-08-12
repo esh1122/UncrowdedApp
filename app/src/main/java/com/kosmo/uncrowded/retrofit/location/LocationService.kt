@@ -1,8 +1,10 @@
 package com.kosmo.uncrowded.retrofit.location
 
 import com.kosmo.uncrowded.model.LocationDTO
+import com.kosmo.uncrowded.model.LocationDetailDTO
 import retrofit2.Call
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface LocationService {
@@ -19,4 +21,9 @@ interface LocationService {
                    @Query("nx") nx:String,
                    @Query("ny") ny:String,): Call<ResponseWeather>
 
+    @GET("/location/detail")
+    fun getLocationDetail(@Query("location_poi") location_poi: String): Call<LocationDetailDTO>
+
+    @GET("/locations/{inter_code}")
+    fun getLocationsByInterCode(@Path("inter_code") inter_code: String): Call<List<LocationDTO>>
 }

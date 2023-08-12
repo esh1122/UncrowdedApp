@@ -39,6 +39,9 @@ data class LocationDTO(
     var temperature: Double = 0.0,
     var uv_index: String = "",
     var sensible_temp: String = "",
-    var code: String = ""
+    var code: String = "",
+
+    val nx: String = "",
+    val ny: String = ""
 )
 

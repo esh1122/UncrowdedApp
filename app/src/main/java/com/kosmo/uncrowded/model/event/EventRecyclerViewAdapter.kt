@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.kosmo.uncrowded.R
 import com.kosmo.uncrowded.databinding.EventLayoutBinding
 import com.kosmo.uncrowded.view.DetailEventFragmentDirections
+import com.kosmo.uncrowded.view.DetailLocationFragmentDirections
 import com.kosmo.uncrowded.view.EventFragmentDirections
 import com.squareup.picasso.Picasso
 import kotlinx.serialization.encodeToString
@@ -55,8 +56,10 @@ class EventRecyclerViewAdapter(
         }
         holder.cardView.setOnClickListener {
             val jsonString = Json.encodeToString(data)
-            val action = EventFragmentDirections.actionEventFragmentToDetailEventFragment(jsonString)
-            // NavController를 통해 ReceiverFragment로 이동하면서 데이터를 전송합니다.
+            val action = when (fragment::class.java.simpleName){
+                "DetailLocationFragment"-> DetailLocationFragmentDirections.actionDetailLocationFragmentToDetailEventFragment(jsonString)
+                else -> EventFragmentDirections.actionEventFragmentToDetailEventFragment(jsonString)
+            }
             NavHostFragment.findNavController(fragment).navigate(action)
         }
 
