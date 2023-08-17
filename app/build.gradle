@@ -127,4 +127,7 @@ dependencies {
     //circle뷰
     implementation 'de.hdodenhof:circleimageview:3.1.0'
 
+    //chatGPT 버튼
+    implementation 'com.getbase:floatingactionbutton:1.10.1'
+
 }

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/home_drawer_menu" android:title="인구 확인" android:icon="@drawable/home" />
-    <item android:id="@+id/setting_drawer_menu" android:title="두번째 화면" android:icon="@drawable/settings" />
-    <item android:id="@+id/contact_drawer_menu" android:title="세번째 화면" android:icon="@drawable/contact" />
+    <item android:id="@+id/drawer_menu_picture" android:title="사진으로 사람수 확인" android:icon="@drawable/ic_camera" />
+    <item android:id="@+id/drawer_menu_chatbot" android:title="chatBot 기능 on/off" android:icon="@drawable/ic_chatbot" />
 </menu>

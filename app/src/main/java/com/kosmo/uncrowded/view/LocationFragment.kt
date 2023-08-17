@@ -45,7 +45,9 @@ class LocationFragment : Fragment() {
                 val index = LocationInterCode.fromInterCode(locations[0].location_inter_code)?.ordinal ?: -1
                 if(selectorIndex != index){
                     binding.locationItemRecyclerview.adapter = LocationItemAdapter(this,locations)
-                    binding.locationItemRecyclerview.addItemDecoration(EventRecyclerViewDecoration(0,30))
+                    if(binding.locationItemRecyclerview.itemDecorationCount == 0){
+                        binding.locationItemRecyclerview.addItemDecoration(EventRecyclerViewDecoration(0,30))
+                    }
                     binding.locationItemRecyclerview.layoutManager = LinearLayoutManager(
                         this.activity,
                         RecyclerView.VERTICAL,

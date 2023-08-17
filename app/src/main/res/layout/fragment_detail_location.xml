@@ -20,7 +20,29 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:layout_width="50dp"
+                android:layout_height="25dp"
+                android:id="@+id/bg_crowd_lvl"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/location_weather"
+                app:layout_constraintVertical_bias="0.05"
+                app:layout_constraintHorizontal_bias="0.1"
+                android:translationZ="1dp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/text_crowd_lvl"
+                android:text="위험도"
+                android:fontFamily="@font/pretendard_black"
+                android:textSize="10sp"
+                app:layout_constraintBottom_toBottomOf="@id/bg_crowd_lvl"
+                app:layout_constraintLeft_toLeftOf="@id/bg_crowd_lvl"
+                app:layout_constraintRight_toRightOf="@id/bg_crowd_lvl"
+                app:layout_constraintTop_toTopOf="@id/bg_crowd_lvl"
+                android:translationZ="2dp"/>
             <ImageView
                 android:id="@+id/detail_location_image"
                 android:layout_width="match_parent"
@@ -126,10 +148,10 @@
                             android:fontFamily="@font/pretendard_black"
                             android:padding="5dp"
                             android:textSize="10sp"
-                            android:text="머신러닝 유동인구" />
+                            android:text="미세먼지" />
 
                         <TextView
-                            android:id="@+id/machine_learning_population"
+                            android:id="@+id/particulates"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/pretendard_black"

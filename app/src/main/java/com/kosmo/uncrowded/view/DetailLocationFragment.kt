@@ -1,6 +1,8 @@
 package com.kosmo.uncrowded.view
 
+import android.graphics.Color
 import android.os.Bundle
+import android.provider.CalendarContract.Colors
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -25,6 +27,7 @@ import com.kosmo.uncrowded.model.event.EventRecyclerViewDecoration
 import com.kosmo.uncrowded.retrofit.location.LocationService
 import com.kosmo.uncrowded.retrofit.member.MemberService
 import com.squareup.picasso.Picasso
+import io.multimoon.colorful.ColorfulColor
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Call
@@ -60,6 +63,15 @@ class DetailLocationFragment : Fragment() {
 
             Picasso.get().load(location.location_image_string).into(binding.detailLocationImage)
             binding.detailLocationName.text = location.location_name
+
+            when(location.congest_level){
+                "여유" -> binding.bgCrowdLvl.setBackgroundColor(Color.GREEN)
+                "보통" -> binding.bgCrowdLvl.setBackgroundColor(Color.YELLOW)
+                "약간 붐빔" -> binding.bgCrowdLvl.setBackgroundColor(Color.parseColor("#ffd700"))
+                "붐빔" -> binding.bgCrowdLvl.setBackgroundColor(Color.RED)
+            }
+            binding.textCrowdLvl.text = location.congest_level
+
             binding.locationBookmark.setOnClickListener {
                 updateFavorite((requireActivity() as MainActivity).fragmentMember.email,location.location_poi){
                     val dialog = AlertDialog.Builder(this.requireContext())
@@ -84,16 +96,16 @@ class DetailLocationFragment : Fragment() {
             }
 
             getDetailData(location.location_poi){
-                Log.i("DetailLocationFragment","날씨 : ${it.precpt_type}")
-                val weatherImage = when(it.precpt_type){
-                    "비"-> R.drawable.ic_rain
-                    "흐림"-> R.drawable.ic_cloud
-                    "낙뢰"-> R.drawable.ic_lightning
-                    "눈"->R.drawable.ic_snow
+                val weatherImage = when{
+                    it.sky in 3..4-> R.drawable.ic_cloud
+                    it.pty in 2..3 -> R.drawable.ic_snow
+                    it.pty == 1 -> R.drawable.ic_rain
                     else -> R.drawable.ic_brightness
                 }
                 binding.locationWeather.setImageResource(weatherImage)
-                binding.machineLearningPopulation.text = "${it.area_ppltn_avg}"
+                binding.realtimePopulation.text = "${it.area_ppltn_avg}"
+                binding.particulates.text = it.air_idx
+
                 it.events?.let { events->
                     val adapter = EventRecyclerViewAdapter(this,events)
                     val linearLayoutManager = LinearLayoutManager(this.activity, RecyclerView.HORIZONTAL,false)

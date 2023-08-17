@@ -20,14 +20,6 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         if (remoteMessage.data.isNotEmpty()) {
             Log.d("com.kosmo.uncrowded.firebase", "Message data payload: ${remoteMessage.data}")
 
-            // Check if data needs to be processed by long running job
-//            if (needsToBeScheduled()) {
-//                // For long-running tasks (10 seconds or more) use WorkManager.
-//                scheduleJob()
-//            } else {
-//                // Handle message within 10 seconds
-//                handleNow()
-//            }
         }
 
         // Check if message contains a notification payload.

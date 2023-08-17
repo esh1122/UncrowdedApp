@@ -85,8 +85,8 @@ class LocationUpdateService(
         // 특정 위치에 도달하면 노티피케이션을 생성하고 노출합니다.
         val builder = NotificationCompat.Builder(this, "CHANNEL_ID")
             .setSmallIcon(R.drawable.ic_logo)  // 알림 아이콘
-            .setContentTitle("현재 위치는 위험한 위치입니다")             // 알림 제목
-            .setContentText("This is a sample notification.") // 알림 내용
+            .setContentTitle("위험 알림")             // 알림 제목
+            .setContentText("현제 계신 위치는 위험합니다") // 알림 내용
             .setPriority(NotificationCompat.PRIORITY_DEFAULT) // 알림 우선 순위
 
         // 알림을 표시합니다.

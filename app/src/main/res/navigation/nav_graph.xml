@@ -74,5 +74,9 @@
         android:name="com.kosmo.uncrowded.MainActivity"
         android:label="activity_login"
         tools:layout="@layout/activity_login" />
+    <activity
+        android:id="@+id/loginActivity"
+        android:name="com.kosmo.uncrowded.LoginActivity"
+        android:label="LoginActivity" />
 
 </navigation>

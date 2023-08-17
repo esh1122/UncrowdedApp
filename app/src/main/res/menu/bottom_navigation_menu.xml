@@ -12,5 +12,4 @@
         android:id="@+id/navigation_event"
         android:icon="@drawable/event"
         android:title="Event" />
-
 </menu>

@@ -81,6 +81,9 @@ class MainFragment : Fragment(), MapView.MapViewEventListener, MapView.POIItemEv
             e.printStackTrace()
         }
         setPOI()
+
+        val mapViewContainer = binding!!.mapView as ViewGroup
+        mapViewContainer.addView(mapView)
         return binding!!.root
     }
 
@@ -95,8 +98,6 @@ class MainFragment : Fragment(), MapView.MapViewEventListener, MapView.POIItemEv
 
     override fun onResume() {
         super.onResume()
-        val mapViewContainer = binding!!.mapView as ViewGroup
-        mapViewContainer.addView(mapView)
         if(!isListening){
             mapView.setMapViewEventListener(this)
         }
