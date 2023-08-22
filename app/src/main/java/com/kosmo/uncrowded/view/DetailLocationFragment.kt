@@ -2,7 +2,6 @@ package com.kosmo.uncrowded.view
 
 import android.graphics.Color
 import android.os.Bundle
-import android.provider.CalendarContract.Colors
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -26,8 +25,8 @@ import com.kosmo.uncrowded.model.event.EventRecyclerViewAdapter
 import com.kosmo.uncrowded.model.event.EventRecyclerViewDecoration
 import com.kosmo.uncrowded.retrofit.location.LocationService
 import com.kosmo.uncrowded.retrofit.member.MemberService
+import com.kosmo.uncrowded.util.LoadingDialogFragment
 import com.squareup.picasso.Picasso
-import io.multimoon.colorful.ColorfulColor
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Call
@@ -35,8 +34,6 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 
 class DetailLocationFragment : Fragment() {
 
@@ -146,6 +143,9 @@ class DetailLocationFragment : Fragment() {
     }
 
     private fun getDetailData(location_poi: String,callback:(LocationDetailDTO)->Unit){
+        val loadingDialog = LoadingDialogFragment()
+        loadingDialog.show(requireActivity().supportFragmentManager, "LoadingDialogFragment")
+
         val retrofit = Retrofit.Builder()
             .baseUrl(resources.getString(R.string.login_fast_api)) // Kakao API base URL
             .addConverterFactory(Json {
@@ -161,6 +161,7 @@ class DetailLocationFragment : Fragment() {
                 response: Response<LocationDetailDTO>
             ) {
                 response.body()?.let { callback(it) }
+                loadingDialog.dismiss()
             }
 
             override fun onFailure(call: Call<LocationDetailDTO>, t: Throwable) {

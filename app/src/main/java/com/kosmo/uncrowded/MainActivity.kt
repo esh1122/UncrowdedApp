@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
@@ -13,6 +14,7 @@ import android.util.Base64
 import android.util.Log
 import android.view.Gravity
 import android.view.MenuItem
+import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
@@ -35,19 +37,19 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import com.kakao.sdk.user.UserApiClient
 import com.kosmo.uncrowded.databinding.ActivityMainBinding
 import com.kosmo.uncrowded.model.MemberDTO
-import com.kosmo.uncrowded.model.picture.PictureMenuCode
 import com.kosmo.uncrowded.model.picture.PictureSelectorAdapter
 import com.kosmo.uncrowded.retrofit.login.LoginService
 import com.kosmo.uncrowded.retrofit.picture.CnnDialog
 import com.kosmo.uncrowded.retrofit.picture.PictureService
 import com.kosmo.uncrowded.retrofit.picture.ResponseCnn
+import com.kosmo.uncrowded.util.LoadingDialogFragment
+import com.kosmo.uncrowded.view.WebViewDialogFragment
+import com.kyleduo.switchbutton.SwitchButton
 import com.orhanobut.dialogplus.DialogPlus
 import com.orhanobut.dialogplus.GridHolder
 import com.squareup.picasso.Picasso
 import io.multimoon.colorful.CAppCompatActivity
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Call
 import retrofit2.Callback
@@ -56,37 +58,109 @@ import retrofit2.Retrofit
 import java.io.ByteArrayOutputStream
 
 
+private val json = Json {
+    ignoreUnknownKeys = true
+    coerceInputValues = true
+}
+
 class MainActivity : CAppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var analytics: FirebaseAnalytics
     private lateinit var navController: NavController
+
     private lateinit var dialog: DialogPlus
+
+    private val imageActivityResultLauncher by lazy {
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result: ActivityResult ->
+            if (result.resultCode == RESULT_OK) {
+                val data = result.data
+                // 이미지 처리 코드
+                val imageBitmap =
+                    if (data?.data != null) {
+                        Log.i("Cnn", "imageBitmap 갤러리")
+                        val selectedImageUri = data.data
+                        val imageStream =
+                            selectedImageUri?.let { contentResolver.openInputStream(it) }
+                        BitmapFactory.decodeStream(imageStream)
+                    } else {
+                        val extras = data?.extras
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            Log.i("Cnn", "imageBitmap 카메라")
+                            extras?.getParcelable("data", Bitmap::class.java)
+                        } else {
+                            Log.i("Cnn", "imageBitmap null처리")
+                            extras?.get("data") as? Bitmap
+                        }
+                    }
+                imageBitmap?.let { imageBitmap ->
+                    getCnnImage(imageBitmap) { cnn ->
+                        Log.i("MainActivity", "cnn 호출")
+                        CnnDialog(cnn, imageBitmap).show(
+                            this.supportFragmentManager,
+                            "ConfirmDialog"
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private val cameraPermissionLauncher by lazy {
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+            if (isGranted) {
+                val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                if (intent.resolveActivity(packageManager) != null) {
+                    imageActivityResultLauncher.launch(intent)
+                }
+            } else {
+                return@registerForActivityResult
+            }
+        }
+    }
+
+    private val galleryPermissionLauncher by lazy {
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+            if (isGranted) {
+                val intent = Intent(Intent.ACTION_PICK)
+                intent.type = "image/*"
+                imageActivityResultLauncher.launch(intent)
+            } else {
+                return@registerForActivityResult
+            }
+        }
+    }
+
     private val permissions = mutableListOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.POST_NOTIFICATIONS)
     private val messagingTopics = mutableListOf<String>()
 
-    private lateinit var member : MemberDTO
+
 
     private var isKakaoLogin = false
 
     private lateinit var locationManager : LocationManager
 
+    private var startTime: Long = 0//디버깅용
 
+    private var loadingDialog : LoadingDialogFragment? = null
+
+    private lateinit var member : MemberDTO
     val fragmentMember : MemberDTO
         get() = member
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        Log.i("com.kosmo.uncrowded","MainActivity생성")
+        Log.i("Loading","MainActivity생성")
+        startTime = System.currentTimeMillis()
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setMember {
-            Picasso.get().load("${resources.getString(R.string.login_fast_api)}profile_image?email=${it.email}")
-                .into(binding.drawerLayout.findViewById<ImageView>(R.id.profile_image))
-            binding.drawerLayout.findViewById<TextView>(R.id.profile_email).text = it.email.replace("@","\n@").trim()
-            binding.drawerLayout.findViewById<TextView>(R.id.profile_name).text = it.name.trim()
-        }
+        //로딩창 출력
+//        loadingDialog = LoadingDialogFragment()
+//        loadingDialog?.show(supportFragmentManager, "LoadingDialogFragment")
+        
         //firebase
         analytics = Firebase.analytics
 
@@ -100,87 +174,6 @@ class MainActivity : CAppCompatActivity() {
 
         //파이어베이스 토큰 생성
         getFirebaseToken()
-
-        //액션바 설정
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.let {
-            it.setDisplayHomeAsUpEnabled(true)
-            it.setHomeAsUpIndicator(R.mipmap.ic_launcher_foreground)
-            it.setDisplayShowTitleEnabled(false)
-        }
-
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        navController = navHostFragment.navController
-
-        val headerView = binding.navigationView.getHeaderView(0)
-        binding.bottomBar.onTabSelected = {
-            when(it.title){
-                "Main"->{
-                    navController.navigate(R.id.action_to_mainFragment)
-                }
-                "Event"->{
-                    navController.navigate(R.id.action_to_eventFragment)
-                }
-                "Location"->{
-                    navController.navigate(R.id.action_to_locationFragment)
-                }
-            }
-        }
-
-        locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
-
-        val imageActivityResultLauncher = registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) { result: ActivityResult ->
-            if (result.resultCode == RESULT_OK) {
-                val data = result.data
-                // 이미지 처리 코드
-                val imageBitmap =
-                    if(data?.extras == null){
-                        Log.i("Cnn","imageBitmap 갤러리")
-                        val selectedImageUri= data?.data
-                        val imageStream = selectedImageUri?.let { contentResolver.openInputStream(it) }
-                        BitmapFactory.decodeStream(imageStream)
-                    }else{
-                        val extras = data.extras
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            Log.i("Cnn","imageBitmap 카메라")
-                            extras?.getParcelable("data", Bitmap::class.java)
-                        } else {
-                            Log.i("Cnn","imageBitmap null처리")
-                            extras?.get("data") as? Bitmap
-                        }
-                    }
-                imageBitmap?.let { imageBitmap->
-                    getCnnImage(imageBitmap){cnn->
-                        Log.i("MainActivity","cnn 호출")
-                        CnnDialog(cnn).show(this.supportFragmentManager, "ConfirmDialog")
-                    }
-                }
-            }
-        }
-
-        val cameraPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
-            if (isGranted) {
-                val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                if (intent.resolveActivity(packageManager) != null) {
-                    imageActivityResultLauncher.launch(intent)
-                }
-            } else {
-                return@registerForActivityResult
-            }
-        }
-
-        val galleryPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
-            if (isGranted) {
-                val intent = Intent(Intent.ACTION_PICK)
-                intent.type = "image/*"
-                imageActivityResultLauncher.launch(intent)
-            } else {
-                return@registerForActivityResult
-            }
-        }
-
 
         dialog = requireMethodToGetPicture{position->
             if(position == 0){
@@ -205,19 +198,64 @@ class MainActivity : CAppCompatActivity() {
         }
 
 
+        //액션바 설정
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.let {
+            it.setDisplayHomeAsUpEnabled(true)
+            it.setHomeAsUpIndicator(R.mipmap.ic_launcher_foreground)
+            it.setDisplayShowTitleEnabled(false)
+        }
 
+        binding.navigationView.menu.findItem(R.id.drawer_menu_chatbot).actionView =
+            SwitchButton(this).apply {
+                tintColor = Color.GREEN
+                setOnCheckedChangeListener { buttonView, isChecked ->
+                    if(isChecked){
+                        binding.btnChatbot.visibility = View.VISIBLE
+                        binding.btnChatbot.setOnClickListener {
+                            WebViewDialogFragment()
+                                .show(supportFragmentManager, "WebViewDialogFragment")
+                        }
+                    }else{
+                        binding.btnChatbot.visibility = View.GONE
+                        binding.btnChatbot.setOnClickListener(null)
+                    }
+                }
+            }
+
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        navController = navHostFragment.navController
+//        val headerView = binding.navigationView.getHeaderView(0)
+        binding.bottomBar.onTabSelected = {
+            when(it.title){
+                "Main"->{
+                    navController.navigate(R.id.action_to_mainFragment)
+                }
+                "Event"->{
+                    navController.navigate(R.id.action_to_eventFragment)
+                }
+                "Location"->{
+                    navController.navigate(R.id.action_to_locationFragment)
+                }
+            }
+        }
+
+        locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
         binding.navigationView.setNavigationItemSelectedListener {item->
             Log.i("MainFragment","메뉴 클릭")
             when(item.itemId){
                 R.id.drawer_menu_picture->{
                     Log.i("MainFragment","0번째 메뉴 클릭")
                     dialog.show()
+                    binding.drawerLayout.closeDrawer(GravityCompat.START)
                 }
                 R.id.drawer_menu_chatbot->{
-
+                    Log.i("MainFragment","1번째 메뉴 클릭")
+                    (binding.navigationView.menu.findItem(R.id.drawer_menu_chatbot).actionView as SwitchButton)
+                        .toggle()
                 }
             }
-            binding.drawerLayout.closeDrawer(GravityCompat.START)
+
             true
         }
     }
@@ -250,7 +288,6 @@ class MainActivity : CAppCompatActivity() {
     //권한 요청
     private fun requestUserPermissions(){
         val deniedPermissions = mutableListOf<String>()
-        val shouldShowRequestPermissions = mutableListOf<String>()
         permissions.forEach {
             val checkPermission = ActivityCompat.checkSelfPermission(this, it) //0:권한 있다,-1:권한 없다
             if (checkPermission == PackageManager.PERMISSION_DENIED) {
@@ -323,14 +360,14 @@ class MainActivity : CAppCompatActivity() {
         if(NotificationManagerCompat.from(this@MainActivity).areNotificationsEnabled()){
             val favorites = member.favorites!!
             favorites.forEach {
-                if(!messagingTopics.contains("${it.location_poi}")){
+                if(!messagingTopics.contains(it.location_poi)){
                     Firebase.messaging.subscribeToTopic("locationPOI${it.location_poi}")
                         .addOnCompleteListener { task ->
                             var msg = "Subscribed"
                             if (!task.isSuccessful) {
                                 msg = "Subscribe failed"
                             }
-                            messagingTopics.add("${it.location_poi}")
+                            messagingTopics.add(it.location_poi)
                             Log.d("com.kosmo.uncrowded", "$msg locationPOI${it.location_poi}")
                         }
                 }else{
@@ -398,7 +435,7 @@ class MainActivity : CAppCompatActivity() {
 
     private fun getCnnImage(bitmap: Bitmap,callback: (ResponseCnn) -> Unit){
         val retrofit = Retrofit.Builder()
-            .baseUrl(resources.getString(R.string.login_fast_api))
+            .baseUrl(resources.getString(R.string.jungha_api))
             .addConverterFactory(Json {
                 ignoreUnknownKeys = true
                 coerceInputValues = true
@@ -407,10 +444,11 @@ class MainActivity : CAppCompatActivity() {
         val service = retrofit.create(PictureService::class.java)
         val byteArrayOutputStream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
-        val byteArray: ByteArray = byteArrayOutputStream.toByteArray()
+        val byteArray= byteArrayOutputStream.toByteArray()
         val encodedString: String = Base64.encodeToString(byteArray, Base64.DEFAULT)
-
-        val call = service.getCnnPeopleCount(encodedString)
+        val map = mapOf("image" to encodedString)
+        val call = service.getCnnPeopleCount(map)
+        byteArrayOutputStream.close()
         call.enqueue(object : Callback<ResponseCnn>{
             override fun onResponse(call: Call<ResponseCnn>, response: Response<ResponseCnn>) {
                 if(response.isSuccessful){
@@ -426,10 +464,26 @@ class MainActivity : CAppCompatActivity() {
         })
     }
 
-    companion object {
-        // 위치 업데이트 간격
-        private const val MIN_TIME_BETWEEN_UPDATES: Long = 10000 // 10초
-        private const val MIN_DISTANCE_CHANGE_FOR_UPDATES: Float = 10f // 10미터
+    override fun onResume() {
+        super.onResume()
+
+        setMember {
+            Picasso.get().load("${resources.getString(R.string.login_fast_api)}profile_image?email=${it.email}")
+                .into(binding.drawerLayout.findViewById<ImageView>(R.id.profile_image))
+            binding.drawerLayout.findViewById<TextView>(R.id.profile_email).text = it.email.replace("@","\n@").trim()
+            binding.drawerLayout.findViewById<TextView>(R.id.profile_name).text = it.name.trim()
+        }
+
+        val endTime = System.currentTimeMillis()
+        val elapsedTime = endTime - startTime
+        loadingDialog?.dismiss()
+        Log.d("TimeMeasurement", "Time from onCreate to onResume: $elapsedTime ms")
     }
+
+//    companion object {
+//        // 위치 업데이트 간격
+//        private const val MIN_TIME_BETWEEN_UPDATES: Long = 10000 // 10초
+//        private const val MIN_DISTANCE_CHANGE_FOR_UPDATES: Float = 10f // 10미터
+//    }
 
 }

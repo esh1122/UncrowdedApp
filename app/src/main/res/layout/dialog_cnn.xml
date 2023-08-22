@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/view_round_white_6"
@@ -8,21 +7,36 @@
     android:minWidth="300dp"
     android:orientation="vertical"
     android:padding="20dp">
-
-    <ImageView
-        android:id="@+id/cnn_image"
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="사진으로 사람 수 확인"
+            android:layout_marginBottom="10dp"
+            android:fontFamily="@font/pretendard_extrabold"
+            android:textSize="20sp"
+            />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+    <ImageView
+        android:id="@+id/cnn_image"
+        android:layout_width="300dp"
+        android:layout_height="200dp"
+        android:layout_marginBottom="10dp"
         android:gravity="center"/>
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:gravity="center">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="총 인원 수"
             android:layout_marginRight="5dp"
             android:fontFamily="@font/pretendard_extrabold"
+            android:textSize="20sp"
             />
 
         <TextView
@@ -30,6 +44,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="0"
-            android:fontFamily="@font/pretendard_regular"/>
+            android:fontFamily="@font/pretendard_regular"
+            android:textSize="20sp"/>
     </androidx.appcompat.widget.LinearLayoutCompat>
 </LinearLayout>

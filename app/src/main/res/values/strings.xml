@@ -14,4 +14,6 @@
     <string name="gong_gong_api_key">2YWi4K1shUr6BH1Il%2F31XJB3oBlPGCL4aqbwjntb7dt%2BRdLnUoSGp5cIYM5a9RyJZmTUGEFfn5AQK%2FPjWi0ClA%3D%3D</string>
     <string name="gong_gong_api">http://apis.data.go.kr/</string>
     <string name="jungha_api">http://192.168.0.122:5000/</string>
+    <string name="chatbot">http://192.168.0.122:5000/</string>
+    <string name="token">USER-Token</string>
 </resources>

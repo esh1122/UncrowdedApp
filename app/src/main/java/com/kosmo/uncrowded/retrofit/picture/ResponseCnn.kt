@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ResponseCnn(
-    val prediction: Int,
-    val base64Plot: String
+    val prediction: Int = 0,
+    val base64Plot: String = ""
 )

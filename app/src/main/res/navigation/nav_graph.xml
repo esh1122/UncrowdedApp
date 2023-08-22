@@ -12,7 +12,11 @@
         tools:layout="@layout/fragment_main" >
         <action
             android:id="@+id/action_mainFragment_to_detailLocationFragment"
-            app:destination="@id/detailLocationFragment" />
+            app:destination="@id/detailLocationFragment"
+            app:enterAnim="@anim/slide_in_bottom"
+            app:exitAnim="@anim/slide_out_bottom"
+            app:popEnterAnim="@anim/slide_in_bottom"
+            app:popExitAnim="@anim/slide_out_bottom" />
     </fragment>
     <fragment
         android:id="@+id/eventFragment"
@@ -21,8 +25,11 @@
         tools:layout="@layout/fragment_event" >
         <action
             android:id="@+id/action_eventFragment_to_detailEventFragment"
-            app:destination="@id/detailEventFragment" >
-        </action>
+            app:destination="@id/detailEventFragment"
+            app:enterAnim="@anim/fade_in_center"
+            app:exitAnim="@anim/fade_out_center"
+            app:popEnterAnim="@anim/fade_in_center"
+            app:popExitAnim="@anim/fade_out_center"></action>
     </fragment>
     <fragment
         android:id="@+id/locationFragment"
@@ -31,18 +38,22 @@
         tools:layout="@layout/fragment_location" >
         <action
             android:id="@+id/action_locationFragment_to_detailLocationFragment"
-            app:destination="@id/detailLocationFragment" />
+            app:destination="@id/detailLocationFragment"
+            app:enterAnim="@anim/slide_in_bottom"
+            app:exitAnim="@anim/slide_out_bottom"
+            app:popEnterAnim="@anim/slide_in_bottom"
+            app:popExitAnim="@anim/slide_out_bottom" />
     </fragment>
 
     <action
         android:id="@+id/action_to_mainFragment"
-        app:destination="@id/mainFragment"/>
+        app:destination="@id/mainFragment" />
     <action
         android:id="@+id/action_to_eventFragment"
         app:destination="@id/eventFragment"/>
     <action
         android:id="@+id/action_to_locationFragment"
-        app:destination="@id/locationFragment"/>
+        app:destination="@id/locationFragment" />
     <fragment
         android:id="@+id/detailEventFragment"
         android:name="com.kosmo.uncrowded.view.DetailEventFragment"
@@ -62,7 +73,11 @@
             app:argType="string" />
         <action
             android:id="@+id/action_detailLocationFragment_to_detailEventFragment"
-            app:destination="@id/detailEventFragment" />
+            app:destination="@id/detailEventFragment"
+            app:enterAnim="@anim/fade_in_center"
+            app:exitAnim="@anim/fade_out_center"
+            app:popEnterAnim="@anim/fade_in_center"
+            app:popExitAnim="@anim/fade_out_center" />
     </fragment>
     <activity
         android:id="@+id/introActivity"

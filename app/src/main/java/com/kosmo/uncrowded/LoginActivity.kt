@@ -19,6 +19,7 @@ import com.kakao.util.maps.helper.Utility
 import com.kosmo.uncrowded.databinding.ActivityLoginBinding
 import com.kosmo.uncrowded.retrofit.login.LoginService
 import com.kosmo.uncrowded.model.MemberDTO
+import com.kosmo.uncrowded.util.LoadingDialogFragment
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Call
@@ -36,23 +37,19 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        val dialog: AlertDialog = AlertDialog.Builder(this)
-            .setCancelable(false)
-            .setIcon(android.R.drawable.ic_lock_lock)
-            .setTitle("로그인")
-            .setView(R.layout.progress_layout).create()
+        val loadingDialog = LoadingDialogFragment()
 
-        Log.d("com.kosmo.uncrowded","${Utility.getKeyHash(this)}")
+        Log.d("com.kosmo.uncrowded", Utility.getKeyHash(this))
         //버튼에 리스너 부착
         binding.btnUncrowdedLogin.setOnClickListener { v ->
             //프로그레스 다이얼로그 띄우기
-            dialog.show()
+            loadingDialog.show(supportFragmentManager, "LoadingDialogFragment")
             //사용자 입력값 받기
             email = binding.email.text.toString().trim()
             password = binding.password.text.toString().trim()
             //스프링 서버로 요청 보내기
             val retrofit = Retrofit.Builder()
-                .addConverterFactory(Json { ignoreUnknownKeys = true }.asConverterFactory("application/json".toMediaType()))
+                .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
                 .baseUrl(R.string.login_api_address_uncrowded.toString()).build() //스프링 REST API로 회원여부 판단을 위한 요청
             val service: LoginService = retrofit.create(LoginService::class.java)
             val call = service.login(MemberDTO(email, password))
@@ -70,6 +67,7 @@ class LoginActivity : AppCompatActivity() {
                             startActivity(intent)
                             //다른 화면에서 로그인 여부 판단을 위한 아이디 저장
                             saveEmailAndPassword(email, password)
+//                            finish()
                         } else { //비회원
                             AlertDialog.Builder(this@LoginActivity)
                                 .setIcon(android.R.drawable.ic_lock_lock)
@@ -88,19 +86,20 @@ class LoginActivity : AppCompatActivity() {
                         }
                     }
                     SystemClock.sleep(2000)
-                    dialog.dismiss()
+                    loadingDialog.dismiss()
                 }
 
                 override fun onFailure(
                     call: Call<MemberDTO?>,
                     t: Throwable
                 ) {
-                    dialog.dismiss()
+                    loadingDialog.dismiss()
                     t.printStackTrace()
                 }
             })
         }
         binding.btnKakaoLogin.setOnClickListener { v ->
+            loadingDialog.show(supportFragmentManager, "LoadingDialogFragment")
             //토큰 존재 여부 파악( true라도 현재 사용자가 로그인 상태임을 보장하지 않습니다.
             if (AuthApiClient.instance.hasToken()) {
                 UserApiClient.instance
@@ -122,21 +121,25 @@ class LoginActivity : AppCompatActivity() {
                                     putExtra("kakao",resources.getString(R.string.uncrowded_key))
                                 }
                             startActivity(intent)
+
                             //다른 화면에서 로그인 여부 판단을 위한 아이디 저장
-                            UserApiClient.instance.me { user, error ->
+                            UserApiClient.instance.me { user, _ ->
                                 saveEmailAndPassword(user!!.kakaoAccount!!.email!!, resources.getString(R.string.uncrowded_key))
                             }
+//                            finish()
                         }
                     }
             } else {
                 //로그인 필요
                 kakaoLogin()
             }
+
+//            SystemClock.sleep(2000)
+//            loadingDialog.dismiss()
         }
     } ///onCreate
 
     private fun kakaoLogin() {
-
         // 카카오톡이 설치되어 있으면 카카오톡으로 로그인, 아니면 카카오계정으로 로그인
         if (UserApiClient.instance.isKakaoTalkLoginAvailable(this)) {
             UserApiClient.instance
@@ -155,6 +158,7 @@ class LoginActivity : AppCompatActivity() {
                             .loginWithKakaoAccount(applicationContext) { token: OAuthToken?, loginError: Throwable? ->
                                 if (loginError != null) {
                                     //로그인실패
+
                                     Log.i("com.kosmo.kosmoapp", "로그인 실패: $loginError")
                                     AlertDialog.Builder(this@LoginActivity)
                                         .setIcon(android.R.drawable.ic_lock_lock)
@@ -176,6 +180,7 @@ class LoginActivity : AppCompatActivity() {
                                     startActivity(intent)
                                     //다른 화면에서 로그인 여부 판단을 위한 아이디 저장
                                     saveEmailAndPassword(email, password)
+//                                    finish()
                                 }
                             }
                     } else if (oAuthToken != null) {
@@ -200,6 +205,7 @@ class LoginActivity : AppCompatActivity() {
                                     startActivity(intent)
                                     //다른 화면에서 로그인 여부 판단을 위한 아이디 저장
                                     saveEmailAndPassword(email, password)
+//                                    finish()
                                 }
                             }
                     }
@@ -216,11 +222,16 @@ class LoginActivity : AppCompatActivity() {
                         //로그인성공
                         //사용자정보요청
                         // Log.i("com.example.kakaologin", "로그인 성공(토큰) : " + oAuthToken.getAccessToken());
-
+//                        finish()
                     }
                 }
         }
     } ///////////////////
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.i("loading","LoginActivity Destroy 호출")
+    }
 
     private fun saveEmailAndPassword(email: String,password: String){
         val preferences =

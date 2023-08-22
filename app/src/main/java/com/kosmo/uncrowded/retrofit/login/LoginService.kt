@@ -17,4 +17,9 @@ interface LoginService {
         @Body member: MemberDTO
     ): Call<MemberDTO?>
 
+    @POST("/token")
+    fun getUncrowdedToken(
+        @Body member: MemberDTO
+    ): Call<Map<String,String>>
+
 }

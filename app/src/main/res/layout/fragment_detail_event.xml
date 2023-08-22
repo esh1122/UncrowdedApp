@@ -9,7 +9,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
         <androidx.cardview.widget.CardView
             app:cardCornerRadius="15dp"
@@ -35,7 +35,7 @@
                         android:layout_width="60dp"
                         android:layout_height="match_parent"
                         android:textSize="15sp"
-                        android:text="Title"
+                        android:text="제목"
                         android:fontFamily="@font/pretendard_black"
                         />
                     <TextView
@@ -55,7 +55,7 @@
                         android:layout_width="60dp"
                         android:layout_height="wrap_content"
                         android:textSize="15sp"
-                        android:text="Date"
+                        android:text="날짜"
                         android:fontFamily="@font/pretendard_black"
                         />
                     <TextView
@@ -75,7 +75,7 @@
                         android:layout_width="60dp"
                         android:layout_height="wrap_content"
                         android:textSize="15sp"
-                        android:text="Venue"
+                        android:text="장소"
                         android:fontFamily="@font/pretendard_black"
                         />
                     <TextView
@@ -95,7 +95,7 @@
                         android:layout_width="60dp"
                         android:layout_height="wrap_content"
                         android:textSize="15sp"
-                        android:text="Theme"
+                        android:text="테마"
                         android:fontFamily="@font/pretendard_black"
                         />
                     <TextView
@@ -115,7 +115,7 @@
                         android:layout_width="60dp"
                         android:layout_height="wrap_content"
                         android:textSize="15sp"
-                        android:text="Target"
+                        android:text="타겟층"
                         android:fontFamily="@font/pretendard_black"
                         />
                     <TextView
@@ -150,7 +150,8 @@
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="right">
+                    android:gravity="right"
+                    android:paddingVertical="5dp">
                     <Button
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

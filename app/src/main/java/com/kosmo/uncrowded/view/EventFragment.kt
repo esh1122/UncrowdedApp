@@ -20,7 +20,6 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.gms.location.FusedLocationProviderClient
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.kosmo.uncrowded.MainActivity
 import com.kosmo.uncrowded.R
@@ -31,6 +30,7 @@ import com.kosmo.uncrowded.model.event.EventRecyclerViewDecoration
 import com.kosmo.uncrowded.model.event.EventSelectorAdapter
 import com.kosmo.uncrowded.model.event.EventSortMenuCode
 import com.kosmo.uncrowded.retrofit.event.EventService
+import com.kosmo.uncrowded.util.LoadingDialogFragment
 import com.orhanobut.dialogplus.DialogPlus
 import com.orhanobut.dialogplus.GridHolder
 import kotlinx.serialization.json.Json
@@ -50,19 +50,10 @@ class EventFragment : Fragment() {
     private var binding: FragmentEventBinding? = null
     private lateinit var dialog : DialogPlus
     private val spinnerItems = EventSortMenuCode.values()
-    private lateinit var fusedLocationClient : FusedLocationProviderClient
+//    private lateinit var fusedLocationClient : FusedLocationProviderClient
     override fun onAttach(context: Context) {
         super.onAttach(context)
         this.context = context
-//        val callback = object : OnBackPressedCallback(true) {
-//            override fun handleOnBackPressed() {
-//                // 백 버튼이 눌렸을 때의 동작 처리
-//                if (handleBackPress()) return
-//                isEnabled = false
-//                requireActivity().onBackPressed()
-//            }
-//        }
-//        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
     }
 
     override fun onCreateView(
@@ -153,6 +144,8 @@ class EventFragment : Fragment() {
     }
 
     private fun getEvent(requirement : String, lat: Double= 0.0, lng: Double= 0.0 ){
+        val loadingDialog = LoadingDialogFragment()
+        loadingDialog.show(requireActivity().supportFragmentManager, "LoadingDialogFragment")
         val retrofit = Retrofit.Builder()
             .baseUrl(resources.getString(R.string.login_fast_api)) // Kakao API base URL
             .addConverterFactory(Json{
@@ -185,6 +178,7 @@ class EventFragment : Fragment() {
                         binding.eventList.addItemDecoration(EventRecyclerViewDecoration(0,60))
                     }
                     binding.eventList.layoutManager = LinearLayoutManager(this@EventFragment.activity, RecyclerView.VERTICAL,false)
+                    loadingDialog.dismiss()
                 }
             }
 
@@ -196,6 +190,8 @@ class EventFragment : Fragment() {
     }
 
     private fun getSearchedEvent(){
+        val loadingDialog = LoadingDialogFragment()
+        loadingDialog.show(requireActivity().supportFragmentManager, "LoadingDialogFragment")
         val retrofit = Retrofit.Builder()
             .baseUrl(resources.getString(R.string.login_fast_api)) // Kakao API base URL
             .addConverterFactory(Json{
@@ -222,6 +218,7 @@ class EventFragment : Fragment() {
                         RecyclerView.VERTICAL,
                         false
                     )
+                    loadingDialog.dismiss()
                 }
 
                 override fun onFailure(call: Call<MutableList<EventDTO>?>, t: Throwable) {

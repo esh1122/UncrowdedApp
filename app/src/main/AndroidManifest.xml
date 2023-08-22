@@ -29,14 +29,6 @@
         tools:targetApi="31"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         android:name="com.kosmo.uncrowded.UncrowdedApplication">
-<!--        <receiver-->
-<!--            android:name=""-->
-<!--            android:directBootAware="true" >-->
-
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />-->
-<!--            </intent-filter>-->
-<!--        </receiver>-->
         <activity
             android:name=".IntroActivity"
             android:exported="true"
@@ -79,10 +71,10 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-        <service android:name=".gps.LocationUpdatesService"
-            android:exported="false">
+<!--        <service android:name=".gps.LocationUpdatesService"-->
+<!--            android:exported="false">-->
 
-        </service>
+<!--        </service>-->
     </application>
 
 </manifest>

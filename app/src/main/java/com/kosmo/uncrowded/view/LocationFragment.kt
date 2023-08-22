@@ -58,7 +58,9 @@ class LocationFragment : Fragment() {
             val snapHelper = LinearSnapHelper()
             snapHelper.attachToRecyclerView(binding.locationSelectorRecyclerview)
             binding.locationSelectorRecyclerview.adapter = adapter
-            binding.locationSelectorRecyclerview.addItemDecoration(EventRecyclerViewDecoration(30,0))
+            if(binding.locationSelectorRecyclerview.itemDecorationCount == 0){
+                binding.locationSelectorRecyclerview.addItemDecoration(EventRecyclerViewDecoration(30,0))
+            }
             binding.locationSelectorRecyclerview.layoutManager = LinearLayoutManager(
                 this.activity,
                 RecyclerView.HORIZONTAL,
@@ -75,5 +77,10 @@ class LocationFragment : Fragment() {
             val bottomBar = activity.findViewById<AnimatedBottomBar>(R.id.bottom_bar)
             bottomBar?.selectTabAt(1)
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        binding = null
     }
 }
