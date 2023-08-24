@@ -63,7 +63,9 @@ class LoginActivity : AppCompatActivity() {
                         if (member != null) { //회원
                             //컨텐츠 화면(MainActivity)으로 전환
                             val intent =
-                                Intent(this@LoginActivity, MainActivity::class.java)
+                                Intent(this@LoginActivity, MainActivity::class.java).apply {
+                                    putExtra("nonKakao",resources.getString(R.string.uncrowded_key))
+                                }
                             startActivity(intent)
                             //다른 화면에서 로그인 여부 판단을 위한 아이디 저장
                             saveEmailAndPassword(email, password)
@@ -117,9 +119,7 @@ class LoginActivity : AppCompatActivity() {
                             Log.i("com.kosmo.kosmoapp", "이미 로그인이 되어 있습니다")
                             //컨텐츠 화면(MainActivity)으로 전환
                             val intent =
-                                Intent(this@LoginActivity, MainActivity::class.java).apply {
-                                    putExtra("kakao",resources.getString(R.string.uncrowded_key))
-                                }
+                                Intent(this@LoginActivity, MainActivity::class.java)
                             startActivity(intent)
 
                             //다른 화면에서 로그인 여부 판단을 위한 아이디 저장
@@ -174,9 +174,7 @@ class LoginActivity : AppCompatActivity() {
                                     )
                                     //컨텐츠 화면(MainActivity)으로 전환
                                     val intent =
-                                        Intent(this@LoginActivity, MainActivity::class.java).apply {
-                                            putExtra("kakao",resources.getString(R.string.uncrowded_key))
-                                        }
+                                        Intent(this@LoginActivity, MainActivity::class.java)
                                     startActivity(intent)
                                     //다른 화면에서 로그인 여부 판단을 위한 아이디 저장
                                     saveEmailAndPassword(email, password)
@@ -199,9 +197,7 @@ class LoginActivity : AppCompatActivity() {
                                 } else {
                                     //컨텐츠 화면(MainActivity)으로 전환
                                     val intent =
-                                        Intent(this@LoginActivity, MainActivity::class.java).apply{
-                                            putExtra("kakao",resources.getString(R.string.uncrowded_key))
-                                        }
+                                        Intent(this@LoginActivity, MainActivity::class.java)
                                     startActivity(intent)
                                     //다른 화면에서 로그인 여부 판단을 위한 아이디 저장
                                     saveEmailAndPassword(email, password)

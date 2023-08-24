@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.webkit.CookieManager
 import android.webkit.WebChromeClient
 import android.webkit.WebView
@@ -63,13 +64,28 @@ class WebViewDialogFragment : DialogFragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        requireActivity().window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        requireActivity().window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        binding = null
+    }
+
     private fun getUncrowdedToken(callback:(String?)->Unit){
         val retrofit = Retrofit.Builder()
             .baseUrl(resources.getString(R.string.login_fast_api))
             .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
             .build()
         val service = retrofit.create(LoginService::class.java)
-        val call = service.getUncrowdedToken((requireActivity() as MainActivity).fragmentMember)
+        val call = service.getUncrowdedToken((requireActivity() as MainActivity).member.value!!)
         call.enqueue(object : Callback<Map<String,String>>{
             override fun onResponse(
                 call: Call<Map<String, String>>,
@@ -86,11 +102,6 @@ class WebViewDialogFragment : DialogFragment() {
             }
 
         })
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        binding = null
     }
 
 }

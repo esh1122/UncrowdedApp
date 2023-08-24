@@ -46,7 +46,7 @@ class LocationSelectorAdapter(
 
     override fun onBindViewHolder(holder: LocationSelectorViewHolder, position: Int) {
         val data = locationEnum[position]
-        holder.itemName.text = data.name
+        holder.itemName.text = data.krName
         holder.itemPoster.setImageResource(data.drawableId)
         (holder.itemName.parent as View).setOnClickListener {
             if(selectedPosition != data.ordinal){

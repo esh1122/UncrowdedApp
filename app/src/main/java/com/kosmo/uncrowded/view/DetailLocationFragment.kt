@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -45,18 +46,49 @@ class DetailLocationFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        Log.i("DetailLocationFragment","DetailLocationFragment onCreateView 호출")
         binding = FragmentDetailLocationBinding.inflate(inflater,container,false)
-        val location = Json.decodeFromString<LocationDTO>(args.locationPoi)
-        memberFavorites = (requireActivity() as MainActivity).fragmentMember.favorites
+        val location = Json{
+            ignoreUnknownKeys = true
+            coerceInputValues = true
+        }.decodeFromString<LocationDTO>(args.locationPoi)
+
 
         binding?.let {binding->
-            var isChecked =
-                if(! memberFavorites.isNullOrEmpty()){
-                    memberFavorites!!.any { it.location_poi == location.location_poi }
-                }else{
-                    false
+            (requireActivity() as MainActivity).member.observe(viewLifecycleOwner){ memberDTO ->
+                memberFavorites = memberDTO.favorites
+                var isChecked =
+                    if(! memberFavorites.isNullOrEmpty()){
+                        memberFavorites!!.any { it.location_poi == location.location_poi }
+                    }else{
+                        false
+                    }
+                if(isChecked) binding.locationBookmark.setImageResource(R.drawable.clicked_bookmark)
+
+                binding.locationBookmark.setOnClickListener {
+                    updateFavorite(memberDTO.email,location.location_poi){
+                        val dialog = AlertDialog.Builder(this.requireContext())
+                            .setTitle("즐겨찾기 변경")
+                        if(it.isSuccess){
+                            dialog.setMessage(it.message).show()
+                            if (isChecked){
+                                binding.locationBookmark.setImageResource(R.drawable.unclicked_bookmark)
+                                Firebase.messaging.unsubscribeFromTopic("locationPOI${location.location_poi}")
+                            }else{
+                                binding.locationBookmark.setImageResource(R.drawable.clicked_bookmark)
+                                Firebase.messaging.subscribeToTopic("locationPOI${location.location_poi}")
+                            }
+//                        (requireActivity() as MainActivity).setMember(){
+//
+//                        }
+                            isChecked = !isChecked
+                        }else{
+                            dialog.setMessage(it.message).show()
+                        }
+                    }
                 }
-            if(isChecked) binding.locationBookmark.setImageResource(R.drawable.clicked_bookmark)
+
+            }
 
             Picasso.get().load(location.location_image_string).into(binding.detailLocationImage)
             binding.detailLocationName.text = location.location_name
@@ -69,28 +101,7 @@ class DetailLocationFragment : Fragment() {
             }
             binding.textCrowdLvl.text = location.congest_level
 
-            binding.locationBookmark.setOnClickListener {
-                updateFavorite((requireActivity() as MainActivity).fragmentMember.email,location.location_poi){
-                    val dialog = AlertDialog.Builder(this.requireContext())
-                        .setTitle("즐겨찾기 변경")
-                    if(it.isSuccess){
-                        dialog.setMessage(it.message).show()
-                        if (isChecked){
-                            binding.locationBookmark.setImageResource(R.drawable.unclicked_bookmark)
-                            Firebase.messaging.unsubscribeFromTopic("locationPOI${location.location_poi}")
-                        }else{
-                            binding.locationBookmark.setImageResource(R.drawable.clicked_bookmark)
-                            Firebase.messaging.subscribeToTopic("locationPOI${location.location_poi}")
-                        }
-//                        (requireActivity() as MainActivity).setMember(){
-//
-//                        }
-                        isChecked = !isChecked
-                    }else{
-                        dialog.setMessage(it.message).show()
-                    }
-                }
-            }
+
 
             getDetailData(location.location_poi){
                 val weatherImage = when{

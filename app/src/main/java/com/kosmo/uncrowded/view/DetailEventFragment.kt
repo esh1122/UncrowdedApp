@@ -28,7 +28,7 @@ class DetailEventFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentDetailEventBinding.inflate(layoutInflater,container,false)
-        val event = Json.decodeFromString<EventDTO>(args.event)
+        val event = Json{ignoreUnknownKeys = true}.decodeFromString<EventDTO>(args.event)
         Iamport.init(this)
         binding?.let {binding->
             if(event.event_image_url.isNotEmpty()) {
@@ -45,9 +45,11 @@ class DetailEventFragment : Fragment() {
             binding.eventDetailVenueName.text=event.event_venue_name
             binding.eventUseTarget.text=event.event_use_target
             binding.eventUseFee.text=event.event_use_fee
-            binding.btnKakaoPay.setOnClickListener{v->
-                UncrowdedEventPaymentRequestBuilder(event,(context as MainActivity).fragmentMember).kakao().payment{
-                    callBackListener.result(it)
+            (requireActivity() as MainActivity).member.observe(viewLifecycleOwner) { memberDTO ->
+                binding.btnKakaoPay.setOnClickListener { v ->
+                    UncrowdedEventPaymentRequestBuilder(event,memberDTO).kakao().payment {
+                        callBackListener.result(it)
+                    }
                 }
             }
         }

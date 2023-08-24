@@ -10,6 +10,7 @@ data class LocationDTO(
     val location_latitude: Double = 0.0,
     val location_longitude: Double = 0.0,
     val gu_code: Int = 0,
+    val location_description: String = "",
     val location_inter_code: String = "",
     // DB에 이미지 넣을때 사용하는 필드
     val location_image_base: ByteArray? = null,

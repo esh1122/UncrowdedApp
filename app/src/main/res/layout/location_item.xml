@@ -13,6 +13,7 @@
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:id="@+id/location_item_container"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -44,7 +45,28 @@
                 app:layout_constraintVertical_bias="0.9"/>
 
         </androidx.appcompat.widget.LinearLayoutCompat>
-
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_width="50dp"
+            android:layout_height="25dp"
+            android:id="@+id/location_item_crowd_lvl"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintHorizontal_bias="0.9"
+            app:layout_constraintTop_toTopOf="@id/location_item_container"
+            android:translationZ="1dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/location_item_text_crowd_lvl"
+            android:text="위험도"
+            android:fontFamily="@font/pretendard_black"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toBottomOf="@id/location_item_crowd_lvl"
+            app:layout_constraintLeft_toLeftOf="@id/location_item_crowd_lvl"
+            app:layout_constraintRight_toRightOf="@id/location_item_crowd_lvl"
+            app:layout_constraintTop_toTopOf="@id/location_item_crowd_lvl"
+            android:translationZ="2dp"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

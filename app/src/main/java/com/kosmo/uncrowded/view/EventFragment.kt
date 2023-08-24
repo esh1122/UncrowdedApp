@@ -160,7 +160,7 @@ class EventFragment : Fragment() {
             .build() //스프링 REST API로 회원여부 판단을 위한 요청
         val service = retrofit.create(EventService::class.java)
         val call = if(requirement == spinnerItems[0].name.lowercase()){
-            service.getRecommendEvents((requireActivity() as MainActivity).fragmentMember.email,lat, lng)
+            service.getRecommendEvents((requireActivity() as MainActivity).member.value!!.email,lat, lng)
         }else{
             service.getEvents(requirement)
         }

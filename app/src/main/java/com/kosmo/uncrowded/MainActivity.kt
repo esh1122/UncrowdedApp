@@ -7,6 +7,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.location.LocationManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
@@ -24,7 +25,9 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
+import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.FirebaseApp
@@ -136,8 +139,6 @@ class MainActivity : CAppCompatActivity() {
     private val permissions = mutableListOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.POST_NOTIFICATIONS)
     private val messagingTopics = mutableListOf<String>()
 
-
-
     private var isKakaoLogin = false
 
     private lateinit var locationManager : LocationManager
@@ -146,9 +147,7 @@ class MainActivity : CAppCompatActivity() {
 
     private var loadingDialog : LoadingDialogFragment? = null
 
-    private lateinit var member : MemberDTO
-    val fragmentMember : MemberDTO
-        get() = member
+    val member: MutableLiveData<MemberDTO> = MutableLiveData()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.i("Loading","MainActivity생성")
@@ -157,10 +156,12 @@ class MainActivity : CAppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+
+
         //로딩창 출력
 //        loadingDialog = LoadingDialogFragment()
 //        loadingDialog?.show(supportFragmentManager, "LoadingDialogFragment")
-        
+
         //firebase
         analytics = Firebase.analytics
 
@@ -225,6 +226,7 @@ class MainActivity : CAppCompatActivity() {
 
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
+
 //        val headerView = binding.navigationView.getHeaderView(0)
         binding.bottomBar.onTabSelected = {
             when(it.title){
@@ -255,7 +257,6 @@ class MainActivity : CAppCompatActivity() {
                         .toggle()
                 }
             }
-
             true
         }
     }
@@ -380,32 +381,34 @@ class MainActivity : CAppCompatActivity() {
     }
 
     fun setMember(callback: (MemberDTO) -> Unit){
-        if(intent.getStringExtra("kakao") == resources.getString(R.string.uncrowded_key)){
+        if(intent.getStringExtra("nonKakao") == resources.getString(R.string.uncrowded_key)){
+            Log.i("com.kosmo.uncrowded","email 처리 : preferences")
+            val preferences = getSharedPreferences("usersInfo", MODE_PRIVATE)
+            val email =preferences.getString("email",null)
+            if (email != null) {
+                getUncrowdedUserByEmail(email){
+                    member.value = it
+                    noficationSetting(it)
+                    callback(it)
+                }
+            }
+
+        }else{
             isKakaoLogin = true
             Log.i("com.kosmo.uncrowded","email 처리 : kakao")
             UserApiClient.instance.me { user, error ->
                 if (user != null) {
                     val email = user.kakaoAccount!!.email!!
                     getUncrowdedUserByEmail(email){
-                        member = it
+                        member.value = it
                         noficationSetting(it)
                         callback(it)
                     }
                 }
             }
-        }else{
-            Log.i("com.kosmo.uncrowded","email 처리 : preferences")
-            val preferences = getSharedPreferences("usersInfo", MODE_PRIVATE)
-            val email =preferences.getString("email",null)
-            if (email != null) {
-                getUncrowdedUserByEmail(email){
-                    member = it
-                    noficationSetting(it)
-                    callback(it)
-                }
-            }
         }
     }
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         //코드로 등록한
@@ -466,14 +469,12 @@ class MainActivity : CAppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-
         setMember {
             Picasso.get().load("${resources.getString(R.string.login_fast_api)}profile_image?email=${it.email}")
                 .into(binding.drawerLayout.findViewById<ImageView>(R.id.profile_image))
             binding.drawerLayout.findViewById<TextView>(R.id.profile_email).text = it.email.replace("@","\n@").trim()
             binding.drawerLayout.findViewById<TextView>(R.id.profile_name).text = it.name.trim()
         }
-
         val endTime = System.currentTimeMillis()
         val elapsedTime = endTime - startTime
         loadingDialog?.dismiss()

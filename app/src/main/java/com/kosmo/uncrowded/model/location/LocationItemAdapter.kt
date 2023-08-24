@@ -1,5 +1,6 @@
 package com.kosmo.uncrowded.model.location
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +13,7 @@ import com.kosmo.uncrowded.databinding.LocationItemBinding
 import com.kosmo.uncrowded.model.LocationDTO
 import com.kosmo.uncrowded.view.LocationFragmentDirections
 import com.squareup.picasso.Picasso
+import de.hdodenhof.circleimageview.CircleImageView
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -23,7 +25,10 @@ class LocationItemAdapter(
     inner class LocationItemViewHolder(binding: LocationItemBinding) : RecyclerView.ViewHolder(binding.root) {
         val itemName: TextView = binding.locationItemName
         val itemGu: TextView = binding.locationItemGu
+        val itemCrowdLvl: TextView = binding.locationItemTextCrowdLvl
         val itemImage: ImageView = binding.locationItemImage
+        val itemBadge: CircleImageView = binding.locationItemCrowdLvl
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LocationItemViewHolder {
@@ -39,6 +44,13 @@ class LocationItemAdapter(
         val data = locations[position]
         holder.itemName.text = data.location_name
         holder.itemGu.text = data.gu_name
+        when(data.congest_level){
+            "여유" -> holder.itemBadge.setBackgroundColor(Color.GREEN)
+            "보통" -> holder.itemBadge.setBackgroundColor(Color.YELLOW)
+            "약간 붐빔" -> holder.itemBadge.setBackgroundColor(Color.parseColor("#ffd700"))
+            "붐빔" -> holder.itemBadge.setBackgroundColor(Color.RED)
+        }
+        holder.itemCrowdLvl.text = data.congest_level
         Picasso.get().load(data.location_image_string).into(holder.itemImage)
         (holder.itemImage.parent as View).setOnClickListener {
             val jsonString = Json.encodeToString(data)

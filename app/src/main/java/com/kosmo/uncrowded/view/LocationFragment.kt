@@ -66,6 +66,7 @@ class LocationFragment : Fragment() {
                 RecyclerView.HORIZONTAL,
                 false
             )
+            binding.locationSelectorRecyclerview
         }
         return binding?.root
     }

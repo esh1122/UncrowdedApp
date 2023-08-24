@@ -9,7 +9,7 @@
         android:id="@+id/mainFragment"
         android:name="com.kosmo.uncrowded.view.MainFragment"
         android:label="fragment_main"
-        tools:layout="@layout/fragment_main" >
+        tools:layout="@layout/fragment_main">
         <action
             android:id="@+id/action_mainFragment_to_detailLocationFragment"
             app:destination="@id/detailLocationFragment"
@@ -67,7 +67,7 @@
         android:id="@+id/detailLocationFragment"
         android:name="com.kosmo.uncrowded.view.DetailLocationFragment"
         android:label="fragment_detail_location"
-        tools:layout="@layout/fragment_detail_location" >
+        tools:layout="@layout/fragment_detail_location">
         <argument
             android:name="location_poi"
             app:argType="string" />
@@ -78,20 +78,14 @@
             app:exitAnim="@anim/fade_out_center"
             app:popEnterAnim="@anim/fade_in_center"
             app:popExitAnim="@anim/fade_out_center" />
+        <deepLink
+            app:action="ACTION_VIEW"
+            app:uri="uncrowded://detail.location.com/{location_poi}" />
     </fragment>
     <activity
         android:id="@+id/introActivity"
         android:name="com.kosmo.uncrowded.IntroActivity"
         android:label="activity_intro"
         tools:layout="@layout/activity_intro" />
-    <activity
-        android:id="@+id/mainActivity"
-        android:name="com.kosmo.uncrowded.MainActivity"
-        android:label="activity_login"
-        tools:layout="@layout/activity_login" />
-    <activity
-        android:id="@+id/loginActivity"
-        android:name="com.kosmo.uncrowded.LoginActivity"
-        android:label="LoginActivity" />
 
 </navigation>
