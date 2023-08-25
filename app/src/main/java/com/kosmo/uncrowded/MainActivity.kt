@@ -74,7 +74,7 @@ class MainActivity : CAppCompatActivity() {
 
     private lateinit var dialog: DialogPlus
 
-    private val imageActivityResultLauncher by lazy {
+    private val imageActivityResultLauncher =
         registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result: ActivityResult ->
@@ -109,9 +109,8 @@ class MainActivity : CAppCompatActivity() {
                 }
             }
         }
-    }
 
-    private val cameraPermissionLauncher by lazy {
+    private val cameraPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
             if (isGranted) {
                 val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
@@ -122,9 +121,8 @@ class MainActivity : CAppCompatActivity() {
                 return@registerForActivityResult
             }
         }
-    }
 
-    private val galleryPermissionLauncher by lazy {
+    private val galleryPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
             if (isGranted) {
                 val intent = Intent(Intent.ACTION_PICK)
@@ -134,7 +132,6 @@ class MainActivity : CAppCompatActivity() {
                 return@registerForActivityResult
             }
         }
-    }
 
     private val permissions = mutableListOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.POST_NOTIFICATIONS)
     private val messagingTopics = mutableListOf<String>()
